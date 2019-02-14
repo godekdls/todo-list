@@ -2,24 +2,31 @@ package com.dain.controller;
 
 import com.dain.controller.model.CreateResponse;
 import com.dain.model.ToDo;
+import com.dain.service.ToDoDetailViewUrlFactory;
 import com.dain.service.ToDoListService;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
 public class ToDoListController {
 
     @Autowired
+    private ToDoDetailViewUrlFactory toDoDetailViewUrlFactory;
+    @Autowired
     private ToDoListService toDoListService;
 
+    @SneakyThrows
     @PostMapping("/todos")
-    public CreateResponse create(@RequestBody ToDo todo) {
+    public ResponseEntity<CreateResponse> create(@RequestBody ToDo todo) {
         Long id = this.toDoListService.create(todo);
-        return new CreateResponse(id);
+        URI uri = this.toDoDetailViewUrlFactory.get(id);
+        return ResponseEntity.created(uri).body(new CreateResponse(id));
     }
 
     @GetMapping("/todos/{id}")

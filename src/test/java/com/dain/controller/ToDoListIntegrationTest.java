@@ -3,6 +3,7 @@ package com.dain.controller;
 import com.dain.ResourceFileReader;
 import com.dain.TestMvcConfig;
 import org.junit.Test;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -12,6 +13,7 @@ import java.net.URI;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.Is.is;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -28,7 +30,8 @@ public class ToDoListIntegrationTest extends TestMvcConfig {
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .content(json))
                 .andDo(print())
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
+                .andExpect(header().exists(HttpHeaders.LOCATION))
                 .andExpect(jsonPath("$.id", is(notNullValue())));
     }
 

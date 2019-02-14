@@ -1,5 +1,6 @@
 package com.dain.service;
 
+import com.dain.exception.NotFoundException;
 import com.dain.model.ToDo;
 import com.dain.repository.ToDoListRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,26 +15,30 @@ public class ToDoListService {
     private ToDoListRepository toDoListRepository;
 
     public Long create(ToDo todo) {
-        return this.toDoListRepository.create(todo);
+        Long id = this.toDoListRepository.create(todo);
+        return id;
     }
 
     public ToDo read(Long id) {
         ToDo read = this.toDoListRepository.read(id);
         if (read == null) {
-            // todo exception
+            throw new NotFoundException("ToDo { id : " + id + " } doesn't exist");
         }
         return read;
     }
 
     public int update(ToDo todo) {
-        return this.toDoListRepository.update(todo);
-        // todo exception
+        int cnt = this.toDoListRepository.update(todo);
+        if (cnt < 1) {
+            throw new NotFoundException("ToDo { id : " + todo.getId() + " } doesn't exist");
+        }
+        return cnt;
     }
 
     public int delete(Long id) {
         int cnt = this.toDoListRepository.delete(id);
-        if (cnt != 1) {
-            // todo exception
+        if (cnt < 1) {
+            throw new NotFoundException("ToDo { id : " + id + " } doesn't exist");
         }
         return cnt;
     }
