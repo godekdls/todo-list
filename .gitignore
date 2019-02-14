@@ -30,6 +30,7 @@
 # auto-import.
 .idea/*
 *.iml
+target/
 
 # CMake
 cmake-build-*/
