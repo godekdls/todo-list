@@ -1,6 +1,7 @@
 package com.dain.service;
 
 import com.dain.MockToDoFactory;
+import com.dain.exception.NotFoundException;
 import com.dain.model.ToDo;
 import com.dain.repository.ToDoListRepository;
 import org.junit.Test;
@@ -9,6 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.hamcrest.Matchers.*;
@@ -54,6 +56,16 @@ public class ToDoListServiceTest {
         assertThat(toDo.getDescription(), is(notNullValue()));
     }
 
+    @Test(expected = NotFoundException.class)
+    public void 할일이_존재하지않는경우_조회할수없다() {
+        // given
+        when(toDoListRepository.read(anyLong())).thenReturn(null);
+        Long id = 123l;
+
+        // when
+        this.toDoListService.read(id);
+    }
+
     @Test
     public void 할일을_수정할수_있다() {
         // given
@@ -65,6 +77,16 @@ public class ToDoListServiceTest {
 
         // then
         assertThat(num, is(1));
+    }
+
+    @Test(expected = NotFoundException.class)
+    public void 할일이_존재하지않는경우_수정할수없다() {
+        // given
+        when(toDoListRepository.update(any(ToDo.class))).thenReturn(0);
+        ToDo toDo = new ToDo();
+
+        // when
+        this.toDoListService.update(toDo);
     }
 
     @Test
@@ -80,6 +102,16 @@ public class ToDoListServiceTest {
         assertThat(num, is(1));
     }
 
+    @Test(expected = NotFoundException.class)
+    public void 할일이_존재하지않는경우_삭제할수없다() {
+        // given
+        when(toDoListRepository.delete(anyLong())).thenReturn(0);
+        Long id = 123l;
+
+        // when
+        this.toDoListService.delete(id);
+    }
+
     @Test
     public void 전체목록을_조회할수_있다() {
         // given
@@ -91,6 +123,18 @@ public class ToDoListServiceTest {
 
         // then
         assertThat(toDos, hasSize(greaterThan(0)));
+    }
+
+    @Test
+    public void 데이터가없을경우_emptyList를_리턴한다() {
+        // given
+        when(toDoListRepository.listAll()).thenReturn(new ArrayList<>());
+
+        // when
+        List<ToDo> toDos = this.toDoListService.listAll();
+
+        // then
+        assertThat(toDos, hasSize(0));
     }
 
 }
