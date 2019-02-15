@@ -56,12 +56,14 @@
                 <tr class="collapse" th:id="'todo-collapse-'+${todo.id}">
                     <td colspan="2"></td>
                     <td colspan="3">
-                        <button th:if="${#strings.equalsIgnoreCase(todo.status, 'closed')}" type="button" class="btn btn-warning">다시열기</button>
-                        <button th:if="${#strings.equalsIgnoreCase(todo.status, 'open')}" type="button" class="btn btn-success">완료하기</button>
+                        <button th:if="${#strings.equalsIgnoreCase(todo.status, 'closed')}" type="button" class="btn btn-warning status-btn"
+                                th:attr="data-id=${todo.id},data-status=${todo.status}">다시열기</button>
+                        <button th:if="${#strings.equalsIgnoreCase(todo.status, 'open')}" type="button" class="btn btn-success status-btn"
+                                th:attr="data-id=${todo.id},data-status=${todo.status}">완료하기</button>
                         <button type="button" class="btn btn-danger update-btn" data-toggle="modal" data-target="update-modal"
-                                th:attr="data-id=${todo.id},data-description=${todo.description},data-status=${todo.status}">수정
+                                th:attr="data-id=${todo.id},data-description=${todo.description},data-status=${todo.status},data-references=${todo.references}">수정
                         </button>
-                        <button type="button" class="btn btn-info" data-toggle="modal"
+                        <button type="button" class="btn btn-info delete-btn" data-toggle="modal"
                                 data-target="#delete-modal"
                                 th:attr="data-id=${todo.id}">삭제
                         </button>
@@ -95,7 +97,7 @@
         </nav>
     </div>
     <div>
-        <!-- modal -->
+        <!-- Modal -->
         <div class="modal fade" id="create-modal" tabindex="-1" role="dialog"
              aria-labelledby="create-modal-title" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">
@@ -116,7 +118,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">취소</button>
-                        <button type="submit" class="btn btn-primary">작성</button>
+                        <button type="submit" class="btn btn-primary" id="create-submit">작성</button>
                     </div>
                 </div>
             </div>
@@ -138,11 +140,18 @@
                                 <label for="update-description">설명</label>
                                 <input class="form-control" id="update-description" value="description">
                             </div>
+                            <div class="form-group">
+                                <label for="update-references">참조</label>
+                                <input class="form-control" id="update-references" value="references">
+                                <small class="form-text text-muted"> ex) @1 @2 </small>
+                            </div>
+                            <input type="hidden" id="update-id">
+                            <input type="hidden" id="update-status">
                         </form>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">취소</button>
-                        <button type="submit" class="btn btn-primary">수정</button>
+                        <button type="submit" class="btn btn-primary" id="update-submit">수정</button>
                     </div>
                 </div>
             </div>
@@ -152,20 +161,21 @@
              aria-labelledby="delete-modal-title" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
+                    <input type="hidden" id="delete-id">
                     <div class="modal-body">
                         정말 삭제하시겠습니까?
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">취소</button>
-                        <button type="submit" class="btn btn-primary">삭제하기</button>
+                        <button type="submit" class="btn btn-primary" id="delete-submit">삭제하기</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
         crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
         integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
@@ -173,6 +183,8 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
         integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
         crossorigin="anonymous"></script>
-<script src="../test.js"></script>
+<script src="../create.js"></script>
+<script src="../update.js"></script>
+<script src="../delete.js"></script>
 </body>
 </html>
