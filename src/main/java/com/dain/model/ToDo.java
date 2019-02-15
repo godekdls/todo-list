@@ -13,7 +13,7 @@ public class ToDo {
     private String description;
     private String createDateTime; // TODO date type
     private String updateDateTime; // TODO date type
-    private Status status; // TODO default value
+    private Status status = Status.open;
     private List<Long> references;
 
     public void complete() {

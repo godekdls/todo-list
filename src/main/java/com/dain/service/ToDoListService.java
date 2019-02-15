@@ -43,8 +43,12 @@ public class ToDoListService {
         return cnt;
     }
 
-    public List<ToDo> listAll() {
-        return this.toDoListRepository.listAll();
+    public List<ToDo> list(int currentPage, int display) {
+        return this.toDoListRepository.list(currentPage, display);
+    }
+
+    public int getTotalCount() {
+        return this.toDoListRepository.getTotalCount();
     }
 
 }

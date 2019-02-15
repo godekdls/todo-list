@@ -28,6 +28,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -246,7 +247,7 @@ public class ToDoListControllerTest {
 
     @Test
     public void listAll() throws Exception {
-        when(toDoListService.listAll()).thenReturn(MockToDoFactory.getMockToDoList());
+        when(toDoListService.list(anyInt(), anyInt())).thenReturn(MockToDoFactory.getMockToDoList());
         URI uri = UriComponentsBuilder.fromPath("/todos")
                 .build().toUri();
 
@@ -258,8 +259,8 @@ public class ToDoListControllerTest {
     }
 
     @Test
-    public void listAll_데이터가_없는경우() throws Exception {
-        when(toDoListService.listAll()).thenReturn(new ArrayList<>());
+    public void list_데이터가_없는경우() throws Exception {
+        when(toDoListService.list(anyInt(), anyInt())).thenReturn(new ArrayList<>());
         URI uri = UriComponentsBuilder.fromPath("/todos")
                 .build().toUri();
 
@@ -270,8 +271,8 @@ public class ToDoListControllerTest {
     }
 
     @Test
-    public void listAll_조회에_실패한경우_500() throws Exception {
-        when(toDoListService.listAll()).thenThrow(new RuntimeException("something unexpected happened"));
+    public void list_조회에_실패한경우_500() throws Exception {
+        when(toDoListService.list(anyInt(), anyInt())).thenThrow(new RuntimeException("something unexpected happened"));
 
         URI uri = UriComponentsBuilder.fromPath("/todos")
                 .build().toUri();
