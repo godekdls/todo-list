@@ -3,7 +3,8 @@ package com.dain.model;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 public class ToDo {
@@ -14,7 +15,11 @@ public class ToDo {
     private String createDateTime; // TODO date type
     private String updateDateTime; // TODO date type
     private Status status = Status.open;
-    private List<Long> references;
+    private Set<Long> references = new HashSet<>();
+
+    public void open() {
+        this.status = Status.open;
+    }
 
     public void complete() {
         this.status = Status.closed;

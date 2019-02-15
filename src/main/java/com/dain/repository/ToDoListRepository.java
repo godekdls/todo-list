@@ -1,5 +1,6 @@
 package com.dain.repository;
 
+import com.dain.model.Status;
 import com.dain.model.ToDo;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -38,6 +39,11 @@ public class ToDoListRepository {
         return 1;
     }
 
+    public int updateStatus(Long id, Status status) {
+        // todo
+        return 1;
+    }
+
     public int delete(Long id) {
         // todo
         return 1;
@@ -52,5 +58,4 @@ public class ToDoListRepository {
         // todo
         return 100;
     }
-
 }

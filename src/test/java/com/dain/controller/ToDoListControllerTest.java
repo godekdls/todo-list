@@ -200,6 +200,60 @@ public class ToDoListControllerTest {
     }
 
     @Test
+    public void patch() throws Exception {
+        when(toDoListService.updateStatus(any(ToDo.class))).thenReturn(1);
+
+        String json = ResourceFileReader.readFile("todo.json");
+        URI uri = UriComponentsBuilder.fromPath("/todos/1")
+                .build().toUri();
+
+        mockMvc.perform(MockMvcRequestBuilders.patch(uri)
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content(json))
+                .andDo(print())
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    public void patch_id가_잘못된경우_400() throws Exception {
+        String json = ResourceFileReader.readFile("todo.json");
+        URI uri = UriComponentsBuilder.fromPath("/todos/a")
+                .build().toUri();
+
+        mockMvc.perform(MockMvcRequestBuilders.patch(uri)
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content(json))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void patch_바디가_누락된경우_400() throws Exception {
+        URI uri = UriComponentsBuilder.fromPath("/todos/1")
+                .build().toUri();
+
+        mockMvc.perform(MockMvcRequestBuilders.patch(uri))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void patch_수정에_실패한경우_500() throws Exception {
+        when(toDoListService.updateStatus(any(ToDo.class))).thenThrow(new RuntimeException("something unexpected happened"));
+
+        String json = ResourceFileReader.readFile("todo.json");
+        URI uri = UriComponentsBuilder.fromPath("/todos/1")
+                .build().toUri();
+
+        mockMvc.perform(MockMvcRequestBuilders.patch(uri)
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content(json))
+                .andDo(print())
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.message", is(notNullValue())));
+    }
+
+    @Test
     public void delete() throws Exception {
         when(toDoListService.delete(anyLong())).thenReturn(1);
         URI uri = UriComponentsBuilder.fromPath("/todos/1")

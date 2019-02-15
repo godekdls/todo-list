@@ -2,6 +2,7 @@ package com.dain.service;
 
 import com.dain.MockToDoFactory;
 import com.dain.exception.NotFoundException;
+import com.dain.model.Status;
 import com.dain.model.ToDo;
 import com.dain.repository.ToDoListRepository;
 import org.junit.Test;
@@ -87,6 +88,29 @@ public class ToDoListServiceTest {
 
         // when
         this.toDoListService.update(toDo);
+    }
+
+    @Test
+    public void 할일의_상태를_변경할수있다() {
+        // given
+        when(toDoListRepository.updateStatus(anyLong(), any(Status.class))).thenReturn(1);
+        ToDo toDo = MockToDoFactory.getMockToDo();
+
+        // when
+        int num = this.toDoListService.updateStatus(toDo);
+
+        // then
+        assertThat(num, is(1));
+    }
+
+    @Test(expected = NotFoundException.class)
+    public void 할일이_존재하지않는경우_상태를_수정할수없다() {
+        // given
+        when(toDoListRepository.updateStatus(anyLong(), any(Status.class))).thenReturn(0);
+        ToDo toDo = new ToDo();
+
+        // when
+        this.toDoListService.updateStatus(toDo);
     }
 
     @Test
