@@ -17,7 +17,7 @@ import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -113,13 +113,15 @@ public class ToDoListServiceTest {
     }
 
     @Test
-    public void 전체목록을_조회할수_있다() {
+    public void 목록을_조회할수_있다() {
         // given
         List<ToDo> mockToDoList = MockToDoFactory.getMockToDoList();
-        when(toDoListRepository.listAll()).thenReturn(mockToDoList);
+        when(toDoListRepository.list(anyInt(), anyInt())).thenReturn(mockToDoList);
+        int currentPage = 1;
+        int display = 10;
 
         // when
-        List<ToDo> toDos = this.toDoListService.listAll();
+        List<ToDo> toDos = this.toDoListService.list(currentPage, display);
 
         // then
         assertThat(toDos, hasSize(greaterThan(0)));
@@ -128,13 +130,27 @@ public class ToDoListServiceTest {
     @Test
     public void 데이터가없을경우_emptyList를_리턴한다() {
         // given
-        when(toDoListRepository.listAll()).thenReturn(new ArrayList<>());
+        when(toDoListRepository.list(anyInt(), anyInt())).thenReturn(new ArrayList<>());
+        int currentPage = 1;
+        int display = 10;
 
         // when
-        List<ToDo> toDos = this.toDoListService.listAll();
+        List<ToDo> toDos = this.toDoListService.list(currentPage, display);
 
         // then
         assertThat(toDos, hasSize(0));
+    }
+
+    @Test
+    public void 전체카운트를_구한다() {
+        // given
+        when(toDoListRepository.getTotalCount()).thenReturn(100);
+
+        // when
+        long totalCount = this.toDoListService.getTotalCount();
+
+        // then
+        assertThat(totalCount, is(100l));
     }
 
 }

@@ -7,6 +7,7 @@ import com.dain.service.ToDoListService;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,6 +15,7 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
+@RequestMapping(produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 public class ToDoListController {
 
     @Autowired
@@ -47,10 +49,10 @@ public class ToDoListController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @GetMapping("/todos")
-    public List<ToDo> listAll() {
-        return this.toDoListService.listAll();
+    @GetMapping(value = "/todos")
+    public List<ToDo> list(@RequestParam(defaultValue = "1") int currentPage,
+                           @RequestParam(defaultValue = "10") int display) {
+        return this.toDoListService.list(currentPage, display);
     }
-
 
 }

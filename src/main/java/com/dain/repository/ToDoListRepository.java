@@ -19,7 +19,8 @@ public class ToDoListRepository {
     public void initMock() {
         ObjectMapper objectMapper = new ObjectMapper();
         String json = "[{\"id\":1,\"description\":\"집안일\",\"createDateTime\":\"2018-04-01 10:00:00\",\"updateDateTime\":\"2018-04-01 13:00:00\",\"status\":\"closed\"},{\"id\":2,\"description\":\"빨래\",\"createDateTime\":\"2018-04-01 11:00:00\",\"updateDateTime\":\"2018-04-01 11:00:00\",\"status\":\"open\",\"references\":[1]},{\"id\":3,\"description\":\"청소\",\"createDateTime\":\"2018-04-01 12:00:00\",\"updateDateTime\":\"2018-04-01 13:00:00\",\"status\":\"open\",\"references\":[1]},{\"id\":4,\"description\":\"방청소\",\"createDateTime\":\"2018-04-01 12:00:00\",\"updateDateTime\":\"2018-04-01 13:00:00\",\"status\":\"open\",\"references\":[1,3]}]";
-        this.mockList = objectMapper.readValue(json, new TypeReference<List<ToDo>>(){});
+        this.mockList = objectMapper.readValue(json, new TypeReference<List<ToDo>>() {
+        });
     }
 
     public Long create(ToDo todo) {
@@ -29,7 +30,7 @@ public class ToDoListRepository {
 
     public ToDo read(Long id) {
         // todo
-        return listAll().get(0);
+        return list(1, 10).get(0);
     }
 
     public int update(ToDo todo) {
@@ -42,8 +43,14 @@ public class ToDoListRepository {
         return 1;
     }
 
-    public List<ToDo> listAll() {
+    public List<ToDo> list(int currentPage, int display) {
+        // todo
         return this.mockList;
+    }
+
+    public int getTotalCount() {
+        // todo
+        return 100;
     }
 
 }

@@ -71,12 +71,25 @@ public class ToDoListRepositoryTest extends TestConfig {
     }
 
     @Test
-    public void 전체목록을_조회할수_있다() {
+    public void 목록을_조회할수_있다() {
+        // given
+        int currentPage = 1;
+        int display = 10;
+
         // when
-        List<ToDo> toDos = this.toDoListRepository.listAll();
+        List<ToDo> toDos = this.toDoListRepository.list(currentPage, display);
 
         // then
         assertThat(toDos, hasSize(greaterThan(0)));
+    }
+
+    @Test
+    public void 전체카운트를_구할수있다() {
+        // when
+        long totalCount = this.toDoListRepository.getTotalCount();
+
+        // then
+        assertThat(totalCount, is(greaterThan(0l)));
     }
 
 }
