@@ -43,6 +43,13 @@ public class ToDoListController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    @PatchMapping("/todos/{id}")
+    public ResponseEntity<Void> patch(@PathVariable Long id, @RequestBody ToDo todo) {
+        todo.setId(id);
+        this.toDoListService.updateStatus(todo);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
     @DeleteMapping("/todos/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         this.toDoListService.delete(id);

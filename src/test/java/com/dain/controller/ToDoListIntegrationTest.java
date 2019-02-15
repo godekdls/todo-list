@@ -62,6 +62,18 @@ public class ToDoListIntegrationTest extends TestMvcConfig {
     }
 
     @Test
+    public void patch() throws Exception {
+        URI uri = UriComponentsBuilder.fromPath("/todos/1")
+                .build().toUri();
+
+        mockMvc.perform(MockMvcRequestBuilders.patch(uri)
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content("{\"id\":\"1\", \"status\":\"closed\"}"))
+                .andDo(print())
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
     public void delete() throws Exception {
         URI uri = UriComponentsBuilder.fromPath("/todos/1")
                 .build().toUri();

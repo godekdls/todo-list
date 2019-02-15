@@ -58,6 +58,36 @@ public class ToDoListRepositoryTest extends TestConfig {
     }
 
     @Test
+    public void 할일을_완료처리할수_있다() {
+        // given
+        Long id = this.toDoListRepository.create(MockToDoFactory.getMockToDo());
+        ToDo toDo = this.toDoListRepository.read(id);
+        toDo.complete();
+
+        // when
+        int num = this.toDoListRepository.updateStatus(toDo.getId(), toDo.getStatus());
+
+        // then
+        assertThat(num, is(1));
+        assertThat(this.toDoListRepository.read(id).getStatus(), is(Status.closed));
+    }
+
+    @Test
+    public void 할일을_열수_있다() {
+        // given
+        Long id = this.toDoListRepository.create(MockToDoFactory.getMockToDo());
+        ToDo toDo = this.toDoListRepository.read(id);
+        toDo.open();
+
+        // when
+        int num = this.toDoListRepository.updateStatus(toDo.getId(), toDo.getStatus());
+
+        // then
+        assertThat(num, is(1));
+        assertThat(this.toDoListRepository.read(id).getStatus(), is(Status.open));
+    }
+
+    @Test
     public void 할일을_삭제할수_있다() {
         // given
         Long id = this.toDoListRepository.create(MockToDoFactory.getMockToDo());

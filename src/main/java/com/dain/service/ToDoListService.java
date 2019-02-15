@@ -35,6 +35,14 @@ public class ToDoListService {
         return cnt;
     }
 
+    public int updateStatus(ToDo toDo) {
+        int cnt = this.toDoListRepository.updateStatus(toDo.getId(), toDo.getStatus());
+        if (cnt < 1) {
+            throw new NotFoundException("ToDo { id : " + toDo.getId() + " } doesn't exist");
+        }
+        return cnt;
+    }
+
     public int delete(Long id) {
         int cnt = this.toDoListRepository.delete(id);
         if (cnt < 1) {
