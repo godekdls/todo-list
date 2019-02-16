@@ -1,4 +1,4 @@
-INSERT INTO to_do(description, status, create_date_time, update_date_time) VALUES
+INSERT INTO to_dos(description, status, create_date_time, update_date_time) VALUES
 ('집안일', 'closed', CURDATE(), CURDATE()),
 ('빨래', 'open', CURDATE(), CURDATE()),
 ('청소', 'open', CURDATE(), CURDATE()),
@@ -50,7 +50,7 @@ INSERT INTO to_do(description, status, create_date_time, update_date_time) VALUE
 ('집안일', 'closed', CURDATE(), CURDATE()),
 ('빨래', 'open', CURDATE(), CURDATE()),
 ('청소', 'open', CURDATE(), CURDATE()),
-('방청소', 'open', CURDATE(), CURDATE());
+('방청소', 'open', '2019-01-16T015:30:16+09:00', '2019-02-16T06:30:16+09:00');
 
 
 INSERT INTO to_do_references(to_do_id, reference) VALUES
