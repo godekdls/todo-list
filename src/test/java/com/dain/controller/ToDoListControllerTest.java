@@ -3,6 +3,7 @@ package com.dain.controller;
 import com.dain.MockToDoFactory;
 import com.dain.ResourceFileReader;
 import com.dain.controller.advice.GlobalExceptionHandler;
+import com.dain.exception.InvalidReferenceException;
 import com.dain.exception.NotFoundException;
 import com.dain.model.Status;
 import com.dain.model.ToDo;
@@ -135,7 +136,7 @@ public class ToDoListControllerTest {
 
     @Test
     public void read_존재하지않는_할일일경우_404() throws Exception {
-        when(toDoListService.read(anyLong())).thenThrow(new NotFoundException("not found"));
+        when(toDoListService.read(anyLong())).thenThrow(new NotFoundException(1l));
 
         URI uri = UriComponentsBuilder.fromPath("/todos/1")
                 .build().toUri();
@@ -143,7 +144,7 @@ public class ToDoListControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.get(uri))
                 .andDo(print())
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.message", is("not found")));
+                .andExpect(jsonPath("$.message", is(notNullValue())));
     }
 
     @Test
@@ -197,6 +198,22 @@ public class ToDoListControllerTest {
                 .content(json))
                 .andDo(print())
                 .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.message", is(notNullValue())));
+    }
+
+    @Test
+    public void update_잘못된_참조가걸린경우_403() throws Exception {
+        when(toDoListService.update(any(ToDo.class))).thenThrow(new InvalidReferenceException("something wrong"));
+
+        String json = ResourceFileReader.readFile("todo.json");
+        URI uri = UriComponentsBuilder.fromPath("/todos/1")
+                .build().toUri();
+
+        mockMvc.perform(MockMvcRequestBuilders.put(uri)
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content(json))
+                .andDo(print())
+                .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.message", is(notNullValue())));
     }
 
@@ -290,14 +307,14 @@ public class ToDoListControllerTest {
 
     @Test
     public void delete_존재하지않는_할일일경우_404() throws Exception {
-        when(toDoListService.delete(anyLong())).thenThrow(new NotFoundException("not found"));
+        when(toDoListService.delete(anyLong())).thenThrow(new NotFoundException(1l));
         URI uri = UriComponentsBuilder.fromPath("/todos/1")
                 .build().toUri();
 
         mockMvc.perform(MockMvcRequestBuilders.delete(uri))
                 .andDo(print())
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.message", is("not found")));
+                .andExpect(jsonPath("$.message", is(notNullValue())));
     }
 
     @Test

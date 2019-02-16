@@ -38,7 +38,7 @@ public class ToDoDetailViewUrlFactoryTest {
     @Test(expected = URISyntaxException.class)
     public void uri생성에_실패하는경우_예외발생() {
         // given
-        String baseUrl = null;//"\"";
+        String baseUrl = "\"";
         ToDoDetailViewUrlFactory toDoDetailViewUrlFactory = new ToDoDetailViewUrlFactory(baseUrl);
         Long id = 1l;
 
