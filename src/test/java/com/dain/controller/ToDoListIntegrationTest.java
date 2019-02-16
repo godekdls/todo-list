@@ -2,7 +2,9 @@ package com.dain.controller;
 
 import com.dain.ResourceFileReader;
 import com.dain.TestMvcConfig;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -17,10 +19,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class ToDoListIntegrationTest extends TestMvcConfig {
 
     @Test
-    public void create() throws Exception {
+    public void _1_create() throws Exception {
         String json = ResourceFileReader.readFile("todo.json");
 
         URI uri = UriComponentsBuilder.fromPath("/todos")
@@ -36,7 +39,7 @@ public class ToDoListIntegrationTest extends TestMvcConfig {
     }
 
     @Test
-    public void read() throws Exception {
+    public void _2_read() throws Exception {
         URI uri = UriComponentsBuilder.fromPath("/todos/1")
                 .build().toUri();
 
@@ -48,7 +51,7 @@ public class ToDoListIntegrationTest extends TestMvcConfig {
     }
 
     @Test
-    public void update() throws Exception {
+    public void _3_update() throws Exception {
         String json = ResourceFileReader.readFile("todo.json");
 
         URI uri = UriComponentsBuilder.fromPath("/todos/1")
@@ -62,7 +65,7 @@ public class ToDoListIntegrationTest extends TestMvcConfig {
     }
 
     @Test
-    public void patch() throws Exception {
+    public void _4_patch() throws Exception {
         URI uri = UriComponentsBuilder.fromPath("/todos/1")
                 .build().toUri();
 
@@ -74,17 +77,7 @@ public class ToDoListIntegrationTest extends TestMvcConfig {
     }
 
     @Test
-    public void delete() throws Exception {
-        URI uri = UriComponentsBuilder.fromPath("/todos/1")
-                .build().toUri();
-
-        mockMvc.perform(MockMvcRequestBuilders.delete(uri))
-                .andDo(print())
-                .andExpect(status().isNoContent());
-    }
-
-    @Test
-    public void listAll() throws Exception {
+    public void _5_listAll() throws Exception {
         URI uri = UriComponentsBuilder.fromPath("/todos")
                 .build().toUri();
 
@@ -93,6 +86,16 @@ public class ToDoListIntegrationTest extends TestMvcConfig {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id", is(notNullValue())))
                 .andExpect(jsonPath("$[0].description", is(notNullValue())));
+    }
+
+    @Test
+    public void _6_delete() throws Exception {
+        URI uri = UriComponentsBuilder.fromPath("/todos/1")
+                .build().toUri();
+
+        mockMvc.perform(MockMvcRequestBuilders.delete(uri))
+                .andDo(print())
+                .andExpect(status().isNoContent());
     }
 
 }

@@ -1,6 +1,7 @@
 package com.dain.service;
 
 import com.dain.MockToDoFactory;
+import com.dain.exception.InvalidReferenceException;
 import com.dain.exception.NotFoundException;
 import com.dain.model.ToDo;
 import com.dain.repository.ToDoRepository;
@@ -9,6 +10,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -22,6 +24,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -75,10 +78,11 @@ public class ToDoListServiceTest {
     }
 
     @Test
-    public void 할일을_수정할수_있다() {
+    public void 할일을_수정할수있다() {
         // given
         ToDo mockToDo = MockToDoFactory.getMockToDo();
         mockToDo.setId(1l);
+        when(toDoRepository.findById(anyLong())).thenReturn(Optional.of(mockToDo));
         when(toDoRepository.save(any(ToDo.class))).thenReturn(mockToDo);
 
         ToDo request = MockToDoFactory.getMockToDo();
@@ -95,14 +99,60 @@ public class ToDoListServiceTest {
         // given
         when(toDoRepository.findById(anyLong())).thenReturn(Optional.empty());
         ToDo toDo = new ToDo();
+        toDo.setId(1l);
 
         // when
         this.toDoListService.update(toDo);
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void id를_명시하지않으면_수정할수없다() {
+        // given
+        ToDo toDo = new ToDo();
+
+        // when
+        this.toDoListService.update(toDo);
+    }
+
+    @Test(expected = InvalidReferenceException.class)
+    public void 존재하지않는_id로는_참조를_걸수없다() {
+        // given
+        ToDo mockToDo = MockToDoFactory.getMockToDo();
+        when(toDoRepository.findById(anyLong())).thenReturn(Optional.of(mockToDo));
+        when(toDoRepository.findById(999l)).thenReturn(Optional.empty());
+
+        ToDo request = MockToDoFactory.getMockToDo();
+        request.getReferences().add(999l);
+
+        // when
+        this.toDoListService.update(request);
+    }
+
+    @Test(expected = InvalidReferenceException.class)
+    public void 상호참조를_걸수없다() {
+        // given
+        ToDo mockToDo1 = MockToDoFactory.getMockToDo();
+        mockToDo1.setId(10l);
+        when(toDoRepository.findById(10l)).thenReturn(Optional.of(mockToDo1));
+
+        ToDo mockToDo2 = MockToDoFactory.getMockToDo();
+        mockToDo2.setId(20l);
+        mockToDo2.getReferences().add(10l);
+        when(toDoRepository.findById(20l)).thenReturn(Optional.of(mockToDo2));
+
+        ToDo request = MockToDoFactory.getMockToDo();
+        request.setId(10l);
+        request.getReferences().add(20l);
+
+        // when
+        this.toDoListService.update(request);
+    }
+
     @Test
     public void 할일의_상태를_변경할수있다() {
         // given
+        ToDo mockToDo = MockToDoFactory.getMockToDo();
+        when(toDoRepository.findById(anyLong())).thenReturn(Optional.of(mockToDo));
         ToDo toDo = MockToDoFactory.getMockToDo();
 
         // when
@@ -117,6 +167,7 @@ public class ToDoListServiceTest {
         // given
         when(toDoRepository.findById(anyLong())).thenReturn(Optional.empty());
         ToDo toDo = new ToDo();
+        toDo.setId(1l);
 
         // when
         this.toDoListService.updateStatus(toDo.getId(), toDo.getStatus());
@@ -126,7 +177,6 @@ public class ToDoListServiceTest {
     public void 할일을_삭제할수_있다() {
         // given
         ToDo mockToDo = MockToDoFactory.getMockToDo();
-        when(toDoRepository.findById(anyLong())).thenReturn(Optional.of(mockToDo));
         Long id = mockToDo.getId();
 
         // when
@@ -139,7 +189,7 @@ public class ToDoListServiceTest {
     @Test(expected = NotFoundException.class)
     public void 할일이_존재하지않는경우_삭제할수없다() {
         // given
-        when(toDoRepository.findById(anyLong())).thenReturn(Optional.empty());
+        doThrow(new EmptyResultDataAccessException(1)).when(toDoRepository).deleteById(anyLong());
         Long id = 123l;
 
         // when
