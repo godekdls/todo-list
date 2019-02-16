@@ -38,6 +38,18 @@ INSERT INTO to_do(description, status, create_date_time, update_date_time) VALUE
 ('집안일', 'closed', CURDATE(), CURDATE()),
 ('빨래', 'open', CURDATE(), CURDATE()),
 ('청소', 'open', CURDATE(), CURDATE()),
+('방청소', 'open', CURDATE(), CURDATE()),
+('집안일', 'closed', CURDATE(), CURDATE()),
+('빨래', 'open', CURDATE(), CURDATE()),
+('청소', 'open', CURDATE(), CURDATE()),
+('방청소', 'open', CURDATE(), CURDATE()),
+('집안일', 'closed', CURDATE(), CURDATE()),
+('빨래', 'open', CURDATE(), CURDATE()),
+('청소', 'open', CURDATE(), CURDATE()),
+('방청소', 'open', CURDATE(), CURDATE()),
+('집안일', 'closed', CURDATE(), CURDATE()),
+('빨래', 'open', CURDATE(), CURDATE()),
+('청소', 'open', CURDATE(), CURDATE()),
 ('방청소', 'open', CURDATE(), CURDATE());
 
 
@@ -76,4 +88,14 @@ INSERT INTO to_do_references(to_do_id, reference) VALUES
 (36, 33), (36, 34), (36, 35), (36, 31),
 (37, 33),
 (38, 36), (38, 31),
-(39, 37), (39, 34);
+(39, 37), (39, 34),
+
+(42, 41),
+(43, 41),
+(44, 41), (44, 43),
+(45, 42), (45, 41),
+(46, 43), (46, 44), (46, 45), (46, 41),
+(47, 43),
+(48, 46), (48, 41),
+(49, 47), (49, 44),
+(51, 43);
