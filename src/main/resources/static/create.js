@@ -6,7 +6,15 @@ function createToDo() {
         alert('내용을 입력해주세요');
         return;
     }
-    var todo = {'description': description, 'references': [], 'status': 'open'};
+    var reference = $('#create-references').val();
+    var references = []
+    try {
+        references = parse(reference);
+    } catch (e) {
+        alert(e);
+        return;
+    }
+    var todo = {'description': description, 'references': references, 'status': 'open'};
     $.ajax({
         url: '/todos',
         type: 'POST',
