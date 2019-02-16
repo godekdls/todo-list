@@ -8,7 +8,7 @@ public class Paginator {
 
     private static final int DEFAULT_PAGE_NUM_PER_VIEW = 10;
 
-    public static Pagination paging(int currentPage, int countPerPage, int totalCount) {
+    public static Pagination paging(int currentPage, int countPerPage, long totalCount) {
         int endPage = (int) (Math.ceil(currentPage / (double) DEFAULT_PAGE_NUM_PER_VIEW) * DEFAULT_PAGE_NUM_PER_VIEW);
         int startPage = (endPage - DEFAULT_PAGE_NUM_PER_VIEW) + 1;
 
@@ -39,7 +39,7 @@ public class Paginator {
     public static class Pagination {
         private int currentPage;
         private int countPerPage;
-        private int totalCount;
+        private long totalCount;
 
         private int startPage;
         private int endPage;

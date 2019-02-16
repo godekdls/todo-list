@@ -4,6 +4,7 @@ import com.dain.MockToDoFactory;
 import com.dain.ResourceFileReader;
 import com.dain.controller.advice.GlobalExceptionHandler;
 import com.dain.exception.NotFoundException;
+import com.dain.model.Status;
 import com.dain.model.ToDo;
 import com.dain.service.ToDoDetailViewUrlFactory;
 import com.dain.service.ToDoListService;
@@ -14,6 +15,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -23,13 +25,12 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.Is.is;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -201,7 +202,7 @@ public class ToDoListControllerTest {
 
     @Test
     public void patch() throws Exception {
-        when(toDoListService.updateStatus(any(ToDo.class))).thenReturn(1);
+        when(toDoListService.updateStatus(anyLong(), any(Status.class))).thenReturn(1);
 
         String json = ResourceFileReader.readFile("todo.json");
         URI uri = UriComponentsBuilder.fromPath("/todos/1")
@@ -239,7 +240,7 @@ public class ToDoListControllerTest {
 
     @Test
     public void patch_수정에_실패한경우_500() throws Exception {
-        when(toDoListService.updateStatus(any(ToDo.class))).thenThrow(new RuntimeException("something unexpected happened"));
+        when(toDoListService.updateStatus(anyLong(), any(Status.class))).thenThrow(new RuntimeException("something unexpected happened"));
 
         String json = ResourceFileReader.readFile("todo.json");
         URI uri = UriComponentsBuilder.fromPath("/todos/1")
@@ -301,7 +302,8 @@ public class ToDoListControllerTest {
 
     @Test
     public void listAll() throws Exception {
-        when(toDoListService.list(anyInt(), anyInt())).thenReturn(MockToDoFactory.getMockToDoList());
+        List<ToDo> mockToDoList = MockToDoFactory.getMockToDoList();
+        when(toDoListService.list(anyInt(), anyInt())).thenReturn(new PageImpl<>(mockToDoList));
         URI uri = UriComponentsBuilder.fromPath("/todos")
                 .build().toUri();
 
@@ -314,7 +316,8 @@ public class ToDoListControllerTest {
 
     @Test
     public void list_데이터가_없는경우() throws Exception {
-        when(toDoListService.list(anyInt(), anyInt())).thenReturn(new ArrayList<>());
+        ArrayList<ToDo> emptyList = new ArrayList<>();
+        when(toDoListService.list(anyInt(), anyInt())).thenReturn(new PageImpl<>(emptyList));
         URI uri = UriComponentsBuilder.fromPath("/todos")
                 .build().toUri();
 
