@@ -59,25 +59,15 @@ function updateToDo() {
         return;
     }
     var reference = $('#update-references').val();
-    if (reference.trim()) {
-        reference = reference.replace(/(\s*)/g, "");
-        refArray = reference.split("@").filter(ref => ref);
-        var isValid = true;
-        $.each(refArray, function (index, ref) {
-            if (isNaN(ref)) {
-                alert('참조 형식이 잘못되었습니다.');
-                isValid = false;
-            }
-        });
-        if (!isValid) {
-            return;
-        }
-        reference = refArray.map(i => Number(i));
-    } else {
-        reference = []
+    var references = []
+    try {
+        references = parse(reference);
+    } catch (e) {
+        alert(e);
+        return;
     }
     var status = $('#update-status').val();
-    var todo = {'id': id, 'description': description, 'references': reference, 'status': status};
+    var todo = {'id': id, 'description': description, 'references': references, 'status': status};
 
     $.ajax({
         url: '/todos/' + id,
