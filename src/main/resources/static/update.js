@@ -60,13 +60,19 @@ function updateToDo() {
     }
     var reference = $('#update-references').val();
     if (reference.trim()) {
-        try {
-            reference = reference.replace(/(\s*)/g, "")
-            reference = reference.split("@").filter(ref => ref).map(i => Number(i));
-        } catch (e) {
-            alert('참조 형식이 잘못되었습니다.')
-            return
+        reference = reference.replace(/(\s*)/g, "");
+        refArray = reference.split("@").filter(ref => ref);
+        var isValid = true;
+        $.each(refArray, function (index, ref) {
+            if (isNaN(ref)) {
+                alert('참조 형식이 잘못되었습니다.');
+                isValid = false;
+            }
+        });
+        if (!isValid) {
+            return;
         }
+        reference = refArray.map(i => Number(i));
     } else {
         reference = []
     }
