@@ -148,6 +148,21 @@ public class ToDoListServiceTest {
         this.toDoListService.update(request);
     }
 
+    @Test(expected = InvalidReferenceException.class)
+    public void 자기자신을_참조할수없다() {
+        // given
+        ToDo mockToDo = MockToDoFactory.getMockToDo();
+        mockToDo.setId(10l);
+        when(toDoRepository.findById(10l)).thenReturn(Optional.of(mockToDo));
+
+        ToDo request = MockToDoFactory.getMockToDo();
+        request.setId(10l);
+        request.getReferences().add(10l);
+
+        // then
+        this.toDoListService.update(request);
+    }
+
     @Test
     public void 할일의_상태를_변경할수있다() {
         // given

@@ -51,6 +51,10 @@ public class ToDoListService {
                 .filter(ref -> !find.get().getReferences().contains(ref))
                 .collect(toList());
 
+        if (newReferences.contains(todo.getId())) {
+            throw new InvalidReferenceException("self reference is not available");
+        }
+
         List<Optional<ToDo>> newReferredToDoList = newReferences.stream()
                 .map(ref -> this.toDoRepository.findById(ref))
                 .collect(toList());

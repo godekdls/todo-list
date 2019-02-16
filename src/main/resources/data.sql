@@ -53,7 +53,7 @@ INSERT INTO to_dos(description, status, create_date_time, update_date_time) VALU
 ('방청소', 'open', '2019-01-16T015:30:16+09:00', '2019-02-16T06:30:16+09:00');
 
 
-INSERT INTO to_do_references(to_do_id, reference) VALUES
+INSERT INTO to_do_references(to_do_id, referred_id) VALUES
 (2, 1),
 (3, 1),
 (4, 1), (4, 3),

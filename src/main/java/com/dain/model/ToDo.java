@@ -34,7 +34,7 @@ public class ToDo {
 
     @ElementCollection(targetClass = Long.class)
     @CollectionTable(name = "to_do_references", joinColumns = @JoinColumn(name = "to_do_id"))
-    @Column(name = "reference")
+    @Column(name = "referred_id")
     private Set<Long> references = new HashSet<>();
 
     public void open() {
