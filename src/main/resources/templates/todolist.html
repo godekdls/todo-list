@@ -51,8 +51,8 @@
                         </span>
                         </div>
                     </td>
-                    <td th:text="${todo.createDateTime}"></td>
-                    <td th:text="${todo.updateDateTime}"></td>
+                    <td th:text="${#dates.format(todo.createDateTime, 'yyyy/MM/dd HH시 mm분')}"></td>
+                    <td th:text="${#dates.format(todo.updateDateTime, 'yyyy/MM/dd HH시 mm분')}"></td>
                 </tr>
                 <tr class="collapse" th:id="'todo-collapse-'+${todo.id}">
                     <td colspan="2"></td>

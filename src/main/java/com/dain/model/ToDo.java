@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Getter
+@Table(name = "to_dos")
 @Entity
 public class ToDo {
 
