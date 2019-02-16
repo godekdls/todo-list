@@ -4,6 +4,7 @@ import com.dain.MockToDoFactory;
 import com.dain.ResourceFileReader;
 import com.dain.controller.advice.GlobalExceptionHandler;
 import com.dain.exception.InvalidReferenceException;
+import com.dain.exception.NotClosableException;
 import com.dain.exception.NotFoundException;
 import com.dain.model.Status;
 import com.dain.model.ToDo;
@@ -176,13 +177,17 @@ public class ToDoListControllerTest {
     }
 
     @Test
-    public void update_바디가_누락된경우_400() throws Exception {
+    public void update_닫을수없는_할일인경우_403() throws Exception {
+        when(toDoListService.update(any(ToDo.class))).thenThrow(new NotClosableException());
+        String json = ResourceFileReader.readFile("todo.json");
         URI uri = UriComponentsBuilder.fromPath("/todos/1")
                 .build().toUri();
 
-        mockMvc.perform(MockMvcRequestBuilders.put(uri))
+        mockMvc.perform(MockMvcRequestBuilders.put(uri)
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content(json))
                 .andDo(print())
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isForbidden());
     }
 
     @Test
@@ -199,6 +204,16 @@ public class ToDoListControllerTest {
                 .andDo(print())
                 .andExpect(status().isInternalServerError())
                 .andExpect(jsonPath("$.message", is(notNullValue())));
+    }
+
+    @Test
+    public void update_바디가_누락된경우_400() throws Exception {
+        URI uri = UriComponentsBuilder.fromPath("/todos/1")
+                .build().toUri();
+
+        mockMvc.perform(MockMvcRequestBuilders.put(uri))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -253,6 +268,20 @@ public class ToDoListControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.patch(uri))
                 .andDo(print())
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void patch_닫을수없는_할일인경우_403() throws Exception {
+        when(toDoListService.updateStatus(anyLong(), any(Status.class))).thenThrow(new NotClosableException());
+        String json = ResourceFileReader.readFile("todo.json");
+        URI uri = UriComponentsBuilder.fromPath("/todos/1")
+                .build().toUri();
+
+        mockMvc.perform(MockMvcRequestBuilders.patch(uri)
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content(json))
+                .andDo(print())
+                .andExpect(status().isForbidden());
     }
 
     @Test

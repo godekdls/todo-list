@@ -1,6 +1,7 @@
 package com.dain.service;
 
 import com.dain.exception.InvalidReferenceException;
+import com.dain.exception.NotClosableException;
 import com.dain.exception.NotFoundException;
 import com.dain.model.Status;
 import com.dain.model.ToDo;
@@ -50,23 +51,10 @@ public class ToDoListService {
         List<Long> newReferences = todo.getReferences().stream()
                 .filter(ref -> !find.get().getReferences().contains(ref))
                 .collect(toList());
-
-        if (newReferences.contains(todo.getId())) {
-            throw new InvalidReferenceException("self reference is not available");
+        checkReferable(todo.getId(), newReferences);
+        if (todo.getStatus() == Status.closed) {
+            checkClosable(todo);
         }
-
-        List<Optional<ToDo>> newReferredToDoList = newReferences.stream()
-                .map(ref -> this.toDoRepository.findById(ref))
-                .collect(toList());
-
-        if (newReferredToDoList.stream().anyMatch(toDo -> !toDo.isPresent())) {
-            throw new InvalidReferenceException("referred todo is not found");
-        }
-        if (newReferredToDoList.stream().map(Optional::get)
-                .anyMatch(list -> list.getReferences().contains(todo.getId()))) {
-            throw new InvalidReferenceException("cross reference is not available");
-        }
-
         this.toDoRepository.save(todo);
         return 1;
     }
@@ -84,6 +72,7 @@ public class ToDoListService {
                 toDo.open();
                 break;
             case closed:
+                checkClosable(toDo);
                 toDo.complete();
                 break;
         }
@@ -103,6 +92,33 @@ public class ToDoListService {
     public Page<ToDo> list(int currentPage, int display) {
         Pageable pageable = PageRequest.of(currentPage - 1, display, SORT);
         return this.toDoRepository.findAll(pageable);
+    }
+
+    private void checkReferable(Long id, List<Long> newReferences) {
+        if (newReferences.contains(id)) {
+            throw new InvalidReferenceException("self reference is not available");
+        }
+
+        List<Optional<ToDo>> newReferredToDoList = newReferences.stream()
+                .map(this.toDoRepository::findById)
+                .collect(toList());
+
+        if (newReferredToDoList.stream().anyMatch(toDo -> !toDo.isPresent())) {
+            throw new InvalidReferenceException("referred todo is not found");
+        }
+        if (newReferredToDoList.stream().map(Optional::get)
+                .anyMatch(list -> list.getReferences().contains(id))) {
+            throw new InvalidReferenceException("cross reference is not available");
+        }
+    }
+
+    private void checkClosable(ToDo toDo) {
+        if (toDo.getReferences().stream()
+                .map(ref -> this.toDoRepository.findById(ref))
+                .filter(Optional::isPresent).map(Optional::get)
+                .anyMatch(ref -> ref.getStatus() == Status.open)) {
+            throw new NotClosableException();
+        }
     }
 
 }

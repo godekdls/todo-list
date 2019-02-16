@@ -71,7 +71,7 @@ public class ToDoListIntegrationTest extends TestMvcConfig {
 
         mockMvc.perform(MockMvcRequestBuilders.patch(uri)
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .content("{\"id\":\"1\", \"status\":\"closed\"}"))
+                .content("{\"id\":\"1\", \"status\":\"open\"}"))
                 .andDo(print())
                 .andExpect(status().isNoContent());
     }

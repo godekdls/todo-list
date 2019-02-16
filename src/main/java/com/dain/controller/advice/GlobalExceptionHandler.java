@@ -2,6 +2,7 @@ package com.dain.controller.advice;
 
 import com.dain.controller.model.ErrorResponse;
 import com.dain.exception.InvalidReferenceException;
+import com.dain.exception.NotClosableException;
 import com.dain.exception.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -19,7 +20,7 @@ public class GlobalExceptionHandler {
         return new ErrorResponse(ex.getMessage());
     }
 
-    @ExceptionHandler(InvalidReferenceException.class)
+    @ExceptionHandler({InvalidReferenceException.class, NotClosableException.class})
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public ErrorResponse _403(Exception ex) {
         return new ErrorResponse(ex.getMessage());
