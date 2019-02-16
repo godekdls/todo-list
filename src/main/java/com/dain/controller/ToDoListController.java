@@ -45,8 +45,7 @@ public class ToDoListController {
 
     @PatchMapping("/todos/{id}")
     public ResponseEntity<Void> patch(@PathVariable Long id, @RequestBody ToDo todo) {
-        todo.setId(id);
-        this.toDoListService.updateStatus(todo);
+        this.toDoListService.updateStatus(id, todo.getStatus());
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
@@ -59,7 +58,7 @@ public class ToDoListController {
     @GetMapping(value = "/todos")
     public List<ToDo> list(@RequestParam(defaultValue = "1") int currentPage,
                            @RequestParam(defaultValue = "10") int display) {
-        return this.toDoListService.list(currentPage, display);
+        return this.toDoListService.list(currentPage, display).getContent();
     }
 
 }
