@@ -47,6 +47,7 @@ public class ToDo {
     @PrePersist
     protected void onCreate() {
         this.createDateTime = new Date();
+        this.updateDateTime = new Date();
     }
 
     @PreUpdate
