@@ -2,6 +2,7 @@ package com.dain.service;
 
 import com.dain.MockToDoFactory;
 import com.dain.exception.InvalidReferenceException;
+import com.dain.exception.NotClosableException;
 import com.dain.exception.NotFoundException;
 import com.dain.model.ToDo;
 import com.dain.repository.ToDoRepository;
@@ -175,6 +176,22 @@ public class ToDoListServiceTest {
 
         // then
         assertThat(num, is(1));
+    }
+
+    @Test(expected = NotClosableException.class)
+    public void 참조된할일중_열린할일이있으면_할일을_종료할수없다() {
+        ToDo mockToDo1 = MockToDoFactory.getMockToDo();
+        mockToDo1.setId(10l);
+        mockToDo1.getReferences().add(20l);
+        mockToDo1.complete();
+        when(toDoRepository.findById(10l)).thenReturn(Optional.of(mockToDo1));
+
+        ToDo mockToDo2 = MockToDoFactory.getMockToDo();
+        mockToDo2.open();
+        when(toDoRepository.findById(20l)).thenReturn(Optional.of(mockToDo2));
+
+        // when
+        this.toDoListService.updateStatus(mockToDo1.getId(), mockToDo1.getStatus());
     }
 
     @Test(expected = NotFoundException.class)
