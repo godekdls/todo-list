@@ -30,6 +30,7 @@ public class ToDoListService {
     private ToDoRepository toDoRepository;
 
     public Long create(ToDo todo) {
+        todo.getReferences().forEach(ref -> ref.setToDo(todo));
         ToDo toDo = this.toDoRepository.save(todo);
         return toDo.getId();
     }
@@ -57,6 +58,7 @@ public class ToDoListService {
         if (todo.getStatus() == Status.closed) {
             checkClosable(todo);
         }
+        todo.getReferences().forEach(ref -> ref.setToDo(todo));
         this.toDoRepository.save(todo);
         return 1;
     }

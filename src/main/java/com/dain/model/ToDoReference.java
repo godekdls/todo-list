@@ -22,6 +22,7 @@ public class ToDoReference {
     @Setter
     @Column(nullable = false)
     private Long referredId;
+    @Setter
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.DETACH)
     @JoinColumn(name = "to_do_id", nullable = false)
     private ToDo toDo;

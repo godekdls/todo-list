@@ -51,7 +51,7 @@ public class ToDoRepositoryTest extends TestConfig {
     public void 할일을_수정할수_있다() {
         // given
         ToDo toDo = MockToDoFactory.getMockToDo();
-        toDo = this.toDoRepository.save(toDo);
+        this.toDoRepository.save(toDo);
         toDo.setDescription("updated");
 
         // when
@@ -66,7 +66,7 @@ public class ToDoRepositoryTest extends TestConfig {
         // given
         ToDo toDo = MockToDoFactory.getMockToDo();
         toDo.open();
-        toDo = this.toDoRepository.save(toDo);
+        this.toDoRepository.save(toDo);
 
         // when
         toDo.complete();
@@ -81,7 +81,7 @@ public class ToDoRepositoryTest extends TestConfig {
         // given
         ToDo toDo = MockToDoFactory.getMockToDo();
         toDo.complete();
-        toDo =  this.toDoRepository.save(toDo);
+        this.toDoRepository.save(toDo);
 
         // when
         toDo.open();
@@ -95,10 +95,13 @@ public class ToDoRepositoryTest extends TestConfig {
     public void 할일을_삭제할수_있다() {
         // given
         ToDo toDo = MockToDoFactory.getMockToDo();
-        toDo = this.toDoRepository.save(toDo);
+        this.toDoRepository.save(toDo);
 
         // when
         this.toDoRepository.deleteById(toDo.getId());
+
+        // then
+        assertThat(this.toDoRepository.findById(toDo.getId()).isPresent(), is(false));
     }
 
     @Test
