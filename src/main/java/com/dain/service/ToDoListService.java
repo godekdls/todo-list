@@ -6,6 +6,7 @@ import com.dain.exception.NotFoundException;
 import com.dain.model.Status;
 import com.dain.model.ToDo;
 import com.dain.model.ToDoReference;
+import com.dain.repository.ToDoReferenceRepository;
 import com.dain.repository.ToDoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -26,8 +27,14 @@ public class ToDoListService {
 
     private static final Sort SORT = new Sort(Sort.Direction.DESC, "id");
 
-    @Autowired
     private ToDoRepository toDoRepository;
+    private ToDoReferenceRepository referenceRepository;
+
+    public ToDoListService(@Autowired ToDoRepository toDoRepository,
+                           @Autowired ToDoReferenceRepository referenceRepository) {
+        this.toDoRepository = toDoRepository;
+        this.referenceRepository = referenceRepository;
+    }
 
     public Long create(ToDo todo) {
         todo.getReferences().forEach(ref -> ref.setToDo(todo));
@@ -86,6 +93,7 @@ public class ToDoListService {
 
     public int delete(Long id) {
         try {
+            this.referenceRepository.deleteAllByReferredId(id);
             this.toDoRepository.deleteById(id);
         } catch (EmptyResultDataAccessException e) {
             throw new NotFoundException(id);

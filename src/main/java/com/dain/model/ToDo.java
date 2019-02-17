@@ -33,7 +33,7 @@ public class ToDo {
     @Column(nullable = false, columnDefinition = "varchar(20) default 'open'")
     private Status status;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "toDo")
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "toDo")
     private Set<ToDoReference> references = new HashSet<>();
 
     public void open() {

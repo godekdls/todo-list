@@ -4,14 +4,19 @@ import com.dain.MockToDoFactory;
 import com.dain.TestConfig;
 import com.dain.model.Status;
 import com.dain.model.ToDo;
+import com.dain.model.ToDoReference;
+import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.toList;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -20,6 +25,8 @@ public class ToDoRepositoryTest extends TestConfig {
 
     @Autowired
     private ToDoRepository toDoRepository;
+    @Autowired
+    private ToDoReferenceRepository referenceRepository;
 
     @Test
     public void 할일을_생성할수_있다() {
@@ -51,7 +58,7 @@ public class ToDoRepositoryTest extends TestConfig {
     public void 할일을_수정할수_있다() {
         // given
         ToDo toDo = MockToDoFactory.getMockToDo();
-        this.toDoRepository.save(toDo);
+        toDo = this.toDoRepository.save(toDo);
         toDo.setDescription("updated");
 
         // when
@@ -66,7 +73,7 @@ public class ToDoRepositoryTest extends TestConfig {
         // given
         ToDo toDo = MockToDoFactory.getMockToDo();
         toDo.open();
-        this.toDoRepository.save(toDo);
+        toDo = this.toDoRepository.save(toDo);
 
         // when
         toDo.complete();
@@ -81,7 +88,7 @@ public class ToDoRepositoryTest extends TestConfig {
         // given
         ToDo toDo = MockToDoFactory.getMockToDo();
         toDo.complete();
-        this.toDoRepository.save(toDo);
+        toDo = this.toDoRepository.save(toDo);
 
         // when
         toDo.open();
@@ -95,13 +102,31 @@ public class ToDoRepositoryTest extends TestConfig {
     public void 할일을_삭제할수_있다() {
         // given
         ToDo toDo = MockToDoFactory.getMockToDo();
-        this.toDoRepository.save(toDo);
+        toDo = this.toDoRepository.save(toDo);
 
         // when
         this.toDoRepository.deleteById(toDo.getId());
 
         // then
         assertThat(this.toDoRepository.findById(toDo.getId()).isPresent(), is(false));
+    }
+
+    @Test
+    public void 할일을삭제하면_할일의_참조관계도_삭제한다() {
+        // given
+        ToDo toDo = MockToDoFactory.getMockToDo();
+        assertThat(toDo.getReferences(), is(not(empty())));
+        toDo = this.toDoRepository.save(toDo);
+        toDo = toDoRepository.findById(toDo.getId()).get();
+        List<Long> referenceIds = toDo.getReferences().stream().map(ToDoReference::getId).collect(toList());
+
+        // when
+        this.toDoRepository.deleteById(toDo.getId());
+
+        // then
+        referenceIds.forEach(refId -> {
+            assertThat(this.referenceRepository.findById(refId).isPresent(), is(false));
+        });
     }
 
     @Test

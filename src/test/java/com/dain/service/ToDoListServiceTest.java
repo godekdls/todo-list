@@ -6,6 +6,7 @@ import com.dain.exception.NotClosableException;
 import com.dain.exception.NotFoundException;
 import com.dain.model.ToDo;
 import com.dain.model.ToDoReference;
+import com.dain.repository.ToDoReferenceRepository;
 import com.dain.repository.ToDoRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,8 +27,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ToDoListServiceTest {
@@ -36,6 +36,8 @@ public class ToDoListServiceTest {
     private ToDoListService toDoListService;
     @Mock
     private ToDoRepository toDoRepository;
+    @Mock
+    private ToDoReferenceRepository referenceRepository;
 
     @Test
     public void 할일을_생성할수_있다() {
@@ -237,6 +239,18 @@ public class ToDoListServiceTest {
 
         // when
         this.toDoListService.delete(id);
+    }
+
+    @Test
+    public void 할일을_삭제하면_할일을_참조하고있는_할일도_함께삭제한다() {
+        // given
+        Long id = 123l;
+
+        // when
+        this.toDoListService.delete(id);
+
+        // then
+        verify(referenceRepository, times(1)).deleteAllByReferredId(id);
     }
 
     @Test
