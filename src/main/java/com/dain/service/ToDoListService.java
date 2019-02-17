@@ -20,8 +20,10 @@ import org.springframework.util.Assert;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 
 @Service
 public class ToDoListService {
@@ -39,11 +41,7 @@ public class ToDoListService {
 
     public Long create(ToDo todo) {
         todo.getReferences().forEach(ref -> ref.setToDo(todo));
-        if (todo.getReferences().stream()
-                .map(ToDoReference::getReferredId)
-                .anyMatch(ref -> !this.toDoRepository.findById(ref).isPresent())) {
-            throw new InvalidReferenceException(ErrorCause.REFERENCE_NOT_FOUND);
-        }
+        checkReferable(todo.getReferences());
 
         ToDo toDo = this.toDoRepository.save(todo);
         return toDo.getId();
@@ -64,10 +62,10 @@ public class ToDoListService {
             throw new NotFoundException(todo.getId());
         }
 
-        List<Long> newReferences = todo.getReferences().stream()
+        Set<Long> newReferences = todo.getReferences().stream()
                 .map(ToDoReference::getReferredId)
-                .filter(ref -> !find.get().getReferences().stream().anyMatch(originalRef -> ref.equals(originalRef.getReferredId())))
-                .collect(toList());
+                .filter(ref -> find.get().getReferences().stream().noneMatch(originalRef -> ref == originalRef.getReferredId()))
+                .collect(toSet());
         checkReferable(todo.getId(), newReferences);
 
         switch (todo.getStatus()) {
@@ -121,7 +119,15 @@ public class ToDoListService {
         return this.toDoRepository.findAll(pageable);
     }
 
-    private void checkReferable(Long id, List<Long> newReferences) {
+    private void checkReferable(Set<ToDoReference> references) {
+        if (references.stream()
+                .map(ToDoReference::getReferredId)
+                .anyMatch(ref -> !this.toDoRepository.findById(ref).isPresent())) {
+            throw new InvalidReferenceException(ErrorCause.REFERENCE_NOT_FOUND);
+        }
+    }
+
+    private void checkReferable(Long id, Set<Long> newReferences) {
         if (newReferences.contains(id)) {
             throw new InvalidReferenceException(ErrorCause.SELF_REFERENCE);
         }

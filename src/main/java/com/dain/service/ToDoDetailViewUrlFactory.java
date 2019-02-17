@@ -16,15 +16,15 @@ public class ToDoDetailViewUrlFactory {
 
     private String baseUrl;
 
+    @Autowired
+    public ToDoDetailViewUrlFactory(@Value("${todo.detail-view.base-url}") String baseUrl) {
+        this.baseUrl = baseUrl;
+    }
+
     @SneakyThrows
     @PostConstruct
     public void verify() {
         new URI(this.baseUrl);
-    }
-
-    @Autowired
-    public ToDoDetailViewUrlFactory(@Value("${todo.detail-view.base-url}") String baseUrl) {
-        this.baseUrl = baseUrl;
     }
 
     @SneakyThrows
