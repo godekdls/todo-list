@@ -4,7 +4,6 @@ import com.dain.controller.model.CreateResponse;
 import com.dain.model.ToDo;
 import com.dain.service.ToDoDetailViewUrlFactory;
 import com.dain.service.ToDoListService;
-import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -23,7 +22,6 @@ public class ToDoListController {
     @Autowired
     private ToDoListService toDoListService;
 
-    @SneakyThrows
     @PostMapping("/todos")
     public ResponseEntity<CreateResponse> create(@RequestBody ToDo todo) {
         Long id = this.toDoListService.create(todo);
