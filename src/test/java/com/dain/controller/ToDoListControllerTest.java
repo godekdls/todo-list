@@ -370,6 +370,18 @@ public class ToDoListControllerTest {
     }
 
     @Test
+    public void delete_존재하지않는_할일일경우_404() throws Exception {
+        when(toDoListService.delete(anyLong())).thenThrow(new NotFoundException(1l));
+        URI uri = UriComponentsBuilder.fromPath("/todos/1")
+                .build().toUri();
+
+        mockMvc.perform(MockMvcRequestBuilders.delete(uri))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message", is(notNullValue())));
+    }
+
+    @Test
     public void delete_삭제에_실패한경우_500() throws Exception {
         when(toDoListService.delete(anyLong())).thenThrow(new RuntimeException("something unexpected happened"));
 
@@ -379,18 +391,6 @@ public class ToDoListControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.delete(uri))
                 .andDo(print())
                 .andExpect(status().isInternalServerError())
-                .andExpect(jsonPath("$.message", is(notNullValue())));
-    }
-
-    @Test
-    public void delete_존재하지않는_할일일경우_404() throws Exception {
-        when(toDoListService.delete(anyLong())).thenThrow(new NotFoundException(1l));
-        URI uri = UriComponentsBuilder.fromPath("/todos/1")
-                .build().toUri();
-
-        mockMvc.perform(MockMvcRequestBuilders.delete(uri))
-                .andDo(print())
-                .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message", is(notNullValue())));
     }
 
