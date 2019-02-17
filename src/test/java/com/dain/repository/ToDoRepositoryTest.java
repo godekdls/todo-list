@@ -14,8 +14,10 @@ import org.springframework.data.domain.Sort;
 import javax.validation.ConstraintViolationException;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -30,8 +32,9 @@ public class ToDoRepositoryTest extends TestConfig {
     @Test
     public void 할일을_생성할수_있다() {
         // given
-        ToDo toDo = MockToDoFactory.getMockToDo();
-        toDo.setId(null);
+        ToDo toDo = new ToDo();
+        toDo.setDescription("hi");
+        toDo.open();
 
         // when
         ToDo result = this.toDoRepository.save(toDo);
@@ -181,12 +184,41 @@ public class ToDoRepositoryTest extends TestConfig {
     }
 
     @Test
-    public void 전체카운트를_구할수있다() {
+    public void 할일을수정하면_참조도_함께수정된다() {
+        // given
+        ToDo mockToDo = MockToDoFactory.getMockToDo();
+        mockToDo.getReferences().clear();
+
+        ToDoReference reference1 = new ToDoReference();
+        reference1.setReferredId(100l);
+        reference1.setToDo(mockToDo);
+        mockToDo.getReferences().add(reference1);
+
+        ToDoReference reference2 = new ToDoReference();
+        reference2.setReferredId(200l);
+        reference2.setToDo(mockToDo);
+        mockToDo.getReferences().add(reference2);
+
+        mockToDo = this.toDoRepository.save(mockToDo);
+
         // when
-        long totalCount = this.toDoRepository.count();
+        Set<ToDoReference> newReferences = mockToDo.getReferences().stream()
+                .filter(ref -> ref.getReferredId() == reference1.getReferredId())
+                .collect(toSet());
+        ToDoReference reference3 = new ToDoReference();
+        reference3.setReferredId(300l);
+        reference3.setToDo(mockToDo);
+        newReferences.add(reference3);
+
+        mockToDo.setReferences(newReferences);
+        this.toDoRepository.save(mockToDo);
 
         // then
-        assertThat(totalCount, is(greaterThan(0l)));
+        ToDo toDo = toDoRepository.findById(mockToDo.getId()).get();
+        List<Long> references = toDo.getReferences().stream()
+                .map(ToDoReference::getReferredId).collect(toList());
+        assertThat(references, hasSize(2));
+        assertThat(references, hasItems(reference1.getReferredId(), reference3.getReferredId()));
     }
 
 }
