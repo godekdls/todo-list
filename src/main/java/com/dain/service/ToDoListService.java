@@ -39,7 +39,12 @@ public class ToDoListService {
 
     public Long create(ToDo todo) {
         todo.getReferences().forEach(ref -> ref.setToDo(todo));
-//      ref not found todo
+        if (todo.getReferences().stream()
+                .map(ToDoReference::getReferredId)
+                .anyMatch(ref -> !this.toDoRepository.findById(ref).isPresent())) {
+            throw new InvalidReferenceException(ErrorCause.REFERENCE_NOT_FOUND);
+        }
+
         ToDo toDo = this.toDoRepository.save(todo);
         return toDo.getId();
     }

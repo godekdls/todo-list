@@ -35,7 +35,8 @@ public class ToDo {
     @Column(nullable = false, columnDefinition = "varchar(20) default 'open'")
     private Status status;
 
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "toDo")
+    @Setter
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "toDo", orphanRemoval = true)
     private Set<ToDoReference> references = new HashSet<>();
 
     public void open() {

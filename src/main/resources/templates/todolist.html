@@ -47,7 +47,7 @@
                         <div th:text="${todo.description}"></div>
                         <div height="20px">
                         <span th:each="reference : ${todo.references}">
-                            <a th:href="@{'todos/'+${reference}}" th:text="'@'+${reference}+' '"></a>
+                            <a th:href="@{'todos/'+${reference.referredId}}" th:text="'@'+${reference.referredId}+' '"></a>
                         </span>
                         </div>
                     </td>
@@ -67,7 +67,11 @@
                         </button>
                         <button type="button" class="btn btn-danger update-btn" data-toggle="modal"
                                 data-target="update-modal"
-                                th:attr="data-id=${todo.id},data-description=${todo.description},data-status=${todo.status},data-references=${todo.references}">
+                                th:attr="data-id=${todo.id},data-description=${todo.description},data-status=${todo.status}">
+                            <th:block th:each="reference : ${todo.references}">
+                                <input type="hidden" th:classappend="'update-' + ${todo.id} + '-references'"
+                                    th:attr="data-reference-id=${reference.id},data-reference-referred-id=${reference.referredId}">
+                            </th:block>
                             수정
                         </button>
                         <button type="button" class="btn btn-info delete-btn" data-toggle="modal"

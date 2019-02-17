@@ -16,5 +16,12 @@ function parse(referenceStr) {
     } else {
         references = []
     }
-    return references;
+
+    var referObjList = []
+    for (i = 0; i < references.length; i++) {
+        var refObj = {};
+        refObj.referredId = references[i];
+        referObjList.push(refObj);
+    }
+    return referObjList;
 }
