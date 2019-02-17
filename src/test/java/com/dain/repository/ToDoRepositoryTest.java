@@ -55,7 +55,7 @@ public class ToDoRepositoryTest extends TestConfig {
     }
 
     @Test(expected = ConstraintViolationException.class)
-    public void 할일설명은_최대_20자를_입력해야한다() {
+    public void 할일설명은_최대_20자까지_입력할수있다() {
         // given
         ToDo toDo = MockToDoFactory.getMockToDo();
         toDo.setId(null);

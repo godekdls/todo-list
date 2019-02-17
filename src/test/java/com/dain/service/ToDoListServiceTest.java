@@ -338,7 +338,7 @@ public class ToDoListServiceTest {
     }
 
     @Test
-    public void 할일을_삭제하면_할일을_참조하고있는_할일도_함께삭제한다() {
+    public void 할일을_삭제하면_할일을_참조관계도_끊는다() {
         // given
         Long id = 123l;
 
