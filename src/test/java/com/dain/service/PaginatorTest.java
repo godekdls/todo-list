@@ -91,4 +91,38 @@ public class PaginatorTest {
         assertThat(pagination.getHasNext(), is(false));
     }
 
+    @Test
+    public void 시작페이지기_전체페이지수보다_큰경우() {
+        int currentPage = 110;
+        int countPerPage = 5;
+        int totalCount = 40;
+
+        // when
+        Paginator.Pagination pagination = Paginator.paging(currentPage, countPerPage, totalCount);
+
+        // then
+        assertThat(pagination.getCurrentPage(), is(8));
+        assertThat(pagination.getStartPage(), is(1));
+        assertThat(pagination.getEndPage(), is(8));
+        assertThat(pagination.getHasPrev(), is(false));
+        assertThat(pagination.getHasNext(), is(false));
+    }
+
+    @Test
+    public void 시작페이지기_전체페이지수보다_큰경우_이전페이지존재() {
+        int currentPage = 110;
+        int countPerPage = 5;
+        int totalCount = 60;
+
+        // when
+        Paginator.Pagination pagination = Paginator.paging(currentPage, countPerPage, totalCount);
+
+        // then
+        assertThat(pagination.getCurrentPage(), is(12));
+        assertThat(pagination.getStartPage(), is(3));
+        assertThat(pagination.getEndPage(), is(12));
+        assertThat(pagination.getHasPrev(), is(true));
+        assertThat(pagination.getHasNext(), is(false));
+    }
+
 }
