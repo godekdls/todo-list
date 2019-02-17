@@ -7,10 +7,6 @@ import lombok.Getter;
 @AllArgsConstructor
 public class ErrorResponse {
 
-    private ErrorCause cause;
-
-    public String getMessage() {
-        return cause.message;
-    }
+    private String message;
 
 }

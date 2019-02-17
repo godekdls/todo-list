@@ -11,9 +11,7 @@ public enum ErrorCause {
 
     NOT_CLOSEABLE("can not close because referred todo is still open"),
 
-    TO_DO_NOT_FOUND("todo doesn't exist"),
-
-    UNKNOWN("unknown");
+    TO_DO_NOT_FOUND("todo doesn't exist");
 
     public final String message;
 

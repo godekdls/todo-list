@@ -1,8 +1,6 @@
 package com.dain.controller.advice;
 
-import com.dain.controller.model.ErrorCause;
 import com.dain.controller.model.ErrorResponse;
-import com.dain.exception.AbstractRunTimeException;
 import com.dain.exception.InvalidReferenceException;
 import com.dain.exception.NotClosableException;
 import com.dain.exception.NotFoundException;
@@ -46,10 +44,7 @@ public class GlobalExceptionHandler {
 
     private ErrorResponse errorResponse(Exception e) {
         log.error("{}", e);
-        if (e instanceof AbstractRunTimeException) {
-            return new ErrorResponse(((AbstractRunTimeException) e).getErrorCause());
-        } else {
-            return new ErrorResponse(ErrorCause.UNKNOWN);
-        }
+        return new ErrorResponse(e.getMessage());
     }
+
 }
