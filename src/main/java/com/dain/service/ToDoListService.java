@@ -5,6 +5,8 @@ import com.dain.exception.NotClosableException;
 import com.dain.exception.NotFoundException;
 import com.dain.model.Status;
 import com.dain.model.ToDo;
+import com.dain.model.ToDoReference;
+import com.dain.repository.ToDoReferenceRepository;
 import com.dain.repository.ToDoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -25,10 +27,17 @@ public class ToDoListService {
 
     private static final Sort SORT = new Sort(Sort.Direction.DESC, "id");
 
-    @Autowired
     private ToDoRepository toDoRepository;
+    private ToDoReferenceRepository referenceRepository;
+
+    public ToDoListService(@Autowired ToDoRepository toDoRepository,
+                           @Autowired ToDoReferenceRepository referenceRepository) {
+        this.toDoRepository = toDoRepository;
+        this.referenceRepository = referenceRepository;
+    }
 
     public Long create(ToDo todo) {
+        todo.getReferences().forEach(ref -> ref.setToDo(todo));
         ToDo toDo = this.toDoRepository.save(todo);
         return toDo.getId();
     }
@@ -50,11 +59,13 @@ public class ToDoListService {
 
         List<Long> newReferences = todo.getReferences().stream()
                 .filter(ref -> !find.get().getReferences().contains(ref))
+                .map(ToDoReference::getReferredId)
                 .collect(toList());
         checkReferable(todo.getId(), newReferences);
         if (todo.getStatus() == Status.closed) {
             checkClosable(todo);
         }
+        todo.getReferences().forEach(ref -> ref.setToDo(todo));
         this.toDoRepository.save(todo);
         return 1;
     }
@@ -82,6 +93,7 @@ public class ToDoListService {
 
     public int delete(Long id) {
         try {
+            this.referenceRepository.deleteAllByReferredId(id);
             this.toDoRepository.deleteById(id);
         } catch (EmptyResultDataAccessException e) {
             throw new NotFoundException(id);
@@ -114,7 +126,7 @@ public class ToDoListService {
 
     private void checkClosable(ToDo toDo) {
         if (toDo.getReferences().stream()
-                .map(ref -> this.toDoRepository.findById(ref))
+                .map(ref -> this.toDoRepository.findById(ref.getReferredId()))
                 .filter(Optional::isPresent).map(Optional::get)
                 .anyMatch(ref -> ref.getStatus() == Status.open)) {
             throw new NotClosableException();

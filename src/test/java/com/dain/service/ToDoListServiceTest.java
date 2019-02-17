@@ -5,6 +5,8 @@ import com.dain.exception.InvalidReferenceException;
 import com.dain.exception.NotClosableException;
 import com.dain.exception.NotFoundException;
 import com.dain.model.ToDo;
+import com.dain.model.ToDoReference;
+import com.dain.repository.ToDoReferenceRepository;
 import com.dain.repository.ToDoRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,8 +27,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ToDoListServiceTest {
@@ -35,6 +36,8 @@ public class ToDoListServiceTest {
     private ToDoListService toDoListService;
     @Mock
     private ToDoRepository toDoRepository;
+    @Mock
+    private ToDoReferenceRepository referenceRepository;
 
     @Test
     public void 할일을_생성할수_있다() {
@@ -123,7 +126,9 @@ public class ToDoListServiceTest {
         when(toDoRepository.findById(999l)).thenReturn(Optional.empty());
 
         ToDo request = MockToDoFactory.getMockToDo();
-        request.getReferences().add(999l);
+        ToDoReference reference = new ToDoReference();
+        reference.setReferredId(999l);
+        request.getReferences().add(reference);
 
         // when
         this.toDoListService.update(request);
@@ -138,12 +143,16 @@ public class ToDoListServiceTest {
 
         ToDo mockToDo2 = MockToDoFactory.getMockToDo();
         mockToDo2.setId(20l);
-        mockToDo2.getReferences().add(10l);
+        ToDoReference reference = new ToDoReference();
+        reference.setReferredId(10l);
+        mockToDo2.getReferences().add(reference);
         when(toDoRepository.findById(20l)).thenReturn(Optional.of(mockToDo2));
 
         ToDo request = MockToDoFactory.getMockToDo();
         request.setId(10l);
-        request.getReferences().add(20l);
+        reference = new ToDoReference();
+        reference.setReferredId(20l);
+        request.getReferences().add(reference);
 
         // when
         this.toDoListService.update(request);
@@ -158,7 +167,9 @@ public class ToDoListServiceTest {
 
         ToDo request = MockToDoFactory.getMockToDo();
         request.setId(10l);
-        request.getReferences().add(10l);
+        ToDoReference reference = new ToDoReference();
+        reference.setReferredId(10l);
+        request.getReferences().add(reference);
 
         // then
         this.toDoListService.update(request);
@@ -182,7 +193,9 @@ public class ToDoListServiceTest {
     public void 참조된할일중_열린할일이있으면_할일을_종료할수없다() {
         ToDo mockToDo1 = MockToDoFactory.getMockToDo();
         mockToDo1.setId(10l);
-        mockToDo1.getReferences().add(20l);
+        ToDoReference reference = new ToDoReference();
+        reference.setReferredId(20l);
+        mockToDo1.getReferences().add(reference);
         mockToDo1.complete();
         when(toDoRepository.findById(10l)).thenReturn(Optional.of(mockToDo1));
 
@@ -226,6 +239,18 @@ public class ToDoListServiceTest {
 
         // when
         this.toDoListService.delete(id);
+    }
+
+    @Test
+    public void 할일을_삭제하면_할일을_참조하고있는_할일도_함께삭제한다() {
+        // given
+        Long id = 123l;
+
+        // when
+        this.toDoListService.delete(id);
+
+        // then
+        verify(referenceRepository, times(1)).deleteAllByReferredId(id);
     }
 
     @Test

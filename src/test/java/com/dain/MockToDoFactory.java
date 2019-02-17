@@ -17,14 +17,20 @@ public class MockToDoFactory {
     @SneakyThrows
     public static ToDo getMockToDo() {
         String json = ResourceFileReader.readFile("todo.json");
-        return OBJECT_MAPPER.readValue(json, ToDo.class);
+        ToDo toDo = OBJECT_MAPPER.readValue(json, ToDo.class);
+        toDo.getReferences().forEach(ref -> ref.setToDo(toDo));
+        return toDo;
     }
 
     @SneakyThrows
     public static List<ToDo> getMockToDoList() {
         String json = ResourceFileReader.readFile("todo-list.json");
-        return OBJECT_MAPPER.readValue(json, new TypeReference<List<ToDo>>() {
+        List<ToDo> toDos = OBJECT_MAPPER.readValue(json, new TypeReference<List<ToDo>>() {
         });
+        toDos.forEach(toDo -> {
+            toDo.getReferences().forEach(ref -> ref.setToDo(toDo));
+        });
+        return toDos;
     }
 
 }

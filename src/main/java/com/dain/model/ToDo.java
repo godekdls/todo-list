@@ -16,6 +16,7 @@ public class ToDo {
     @Setter
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "to_do_id")
     private Long id;
 
     @Setter
@@ -32,10 +33,8 @@ public class ToDo {
     @Column(nullable = false, columnDefinition = "varchar(20) default 'open'")
     private Status status;
 
-    @ElementCollection(targetClass = Long.class)
-    @CollectionTable(name = "to_do_references", joinColumns = @JoinColumn(name = "to_do_id"))
-    @Column(name = "referred_id")
-    private Set<Long> references = new HashSet<>();
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "toDo")
+    private Set<ToDoReference> references = new HashSet<>();
 
     public void open() {
         this.status = Status.open;
