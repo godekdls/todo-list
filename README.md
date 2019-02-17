@@ -19,3 +19,7 @@ mvn spring-boot:run
 ## 실행 화면
 http://localhost:8080/todos
 ![image](https://user-images.githubusercontent.com/12438898/52912007-c5951d80-32ee-11e9-916c-39c83d406096.png)
+
+## 데이터베이스
+이 프로젝트는 프로덕션 코드가 아니므로, 설치없이 바로 사용할 수 있는 [h2 database](http://www.h2database.com/html/main.html)를 사용합니다. 프로젝트를 재실행하면 저장된 데이터는 모두 초기화됩니다. 실행 시 [data.sql](https://github.com/godekdls/todo-list/blob/master/src/main/resources/data.sql)에 저장된 쿼리를 실행하여 더미 데이터를 삽입합니다.
+![image](https://user-images.githubusercontent.com/12438898/52914598-b8d3f200-330d-11e9-803f-077837b0ac45.png)
