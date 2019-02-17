@@ -58,7 +58,7 @@ public class ToDoListService {
         }
 
         List<Long> newReferences = todo.getReferences().stream()
-                .filter(ref -> !find.get().getReferences().contains(ref))
+                .filter(ref -> !find.get().getReferences().stream().anyMatch(originalRef -> originalRef.equals(ref)))
                 .map(ToDoReference::getReferredId)
                 .collect(toList());
         checkReferable(todo.getId(), newReferences);

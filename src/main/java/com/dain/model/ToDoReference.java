@@ -35,7 +35,7 @@ public class ToDoReference {
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof ToDoReference) {
-            return this.referredId == ((ToDoReference) obj).referredId;
+            return this.referredId.equals(((ToDoReference) obj).referredId);
         }
         return false;
     }
