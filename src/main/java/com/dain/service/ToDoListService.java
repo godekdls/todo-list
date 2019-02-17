@@ -39,7 +39,12 @@ public class ToDoListService {
 
     public Long create(ToDo todo) {
         todo.getReferences().forEach(ref -> ref.setToDo(todo));
-//      ref not found todo
+        if (todo.getReferences().stream()
+                .map(ToDoReference::getReferredId)
+                .anyMatch(ref -> !this.toDoRepository.findById(ref).isPresent())) {
+            throw new InvalidReferenceException(ErrorCause.REFERENCE_NOT_FOUND);
+        }
+
         ToDo toDo = this.toDoRepository.save(todo);
         return toDo.getId();
     }
@@ -59,14 +64,6 @@ public class ToDoListService {
             throw new NotFoundException(todo.getId());
         }
 
-//        todo.getReferences()
-//                .forEach(originalRef-> {
-//                    Optional<ToDoReference> first = find.get().getReferences().stream()
-//                            .filter(ref -> ref.getReferredId() == originalRef.getReferredId())
-//                            .findFirst();
-//                    first.ifPresent(ref -> originalRef.setId(ref.getId()));
-//                }); ?// 삭제안
-
         List<Long> newReferences = todo.getReferences().stream()
                 .map(ToDoReference::getReferredId)
                 .filter(ref -> !find.get().getReferences().stream().anyMatch(originalRef -> ref.equals(originalRef.getReferredId())))
@@ -82,8 +79,6 @@ public class ToDoListService {
                 break;
         }
 
-//        todo.getReferences().stream()
-//                .filter(ref -> newReferences.contains()ref.getReferredId())
         todo.getReferences().forEach(ref -> ref.setToDo(todo));
         this.toDoRepository.save(todo);
         return 1;

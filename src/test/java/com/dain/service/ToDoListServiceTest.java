@@ -47,6 +47,26 @@ public class ToDoListServiceTest {
         ToDo mockResult = MockToDoFactory.getMockToDo();
         mockResult.setId(123l);
         when(toDoRepository.save(any(ToDo.class))).thenReturn(mockResult);
+        when(toDoRepository.findById(anyLong())).thenReturn(Optional.of(mockResult));
+
+        ToDo request = MockToDoFactory.getMockToDo();
+        request.setId(null);
+
+        // when
+        Long id = this.toDoListService.create(request);
+
+        // then
+        assertThat(id, is(123l));
+    }
+
+    @Test(expected = InvalidReferenceException.class)
+    public void 할일을_생성할때_존재하지않는_할일에는_참조를_걸수없다() {
+        // given
+        ToDo mockResult = MockToDoFactory.getMockToDo();
+        mockResult.setId(10l);
+        ToDoReference reference = new ToDoReference();
+        reference.setReferredId(20l);
+        mockResult.getReferences().add(reference);
 
         ToDo request = MockToDoFactory.getMockToDo();
         request.setId(null);
