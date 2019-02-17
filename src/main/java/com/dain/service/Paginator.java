@@ -19,6 +19,9 @@ public class Paginator {
         if (endPage > totalPage) {
             endPage = totalPage;
         }
+        if (startPage > totalPage) {
+            startPage = Math.max(1, (endPage - DEFAULT_PAGE_NUM_PER_VIEW) + 1);
+        }
 
         boolean hasPrev = startPage == 1 ? false : true;
         boolean hasNext = endPage * countPerPage >= totalCount ? false : true;
