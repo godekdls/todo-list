@@ -22,7 +22,7 @@ public class ToDo {
 
     @Setter
     @Column(columnDefinition = "varchar(100)", nullable = false)
-    @Length(min = 1, max = 20, message = "할일 빈값일 수 없으며 {max}자 이내로 입력해야 합니다.")
+    @Length(min = 1, max = 20, message = "설명은 빈값일 수 없으며 {max}자 이내로 입력해야 합니다.")
     private String description;
 
     @Column(updatable = false, nullable = false)
