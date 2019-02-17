@@ -62,9 +62,16 @@ public class ToDoListService {
                 .filter(ref -> !find.get().getReferences().stream().anyMatch(originalRef -> ref.equals(originalRef.getReferredId())))
                 .collect(toList());
         checkReferable(todo.getId(), newReferences);
-        if (todo.getStatus() == Status.closed) {
-            checkClosable(todo);
+
+        switch (todo.getStatus()) {
+            case open:
+                openAllReferredToDoList(todo.getId());
+                break;
+            case closed:
+                checkClosable(todo);
+                break;
         }
+
         todo.getReferences().forEach(ref -> ref.setToDo(todo));
         this.toDoRepository.save(todo);
         return 1;
@@ -80,6 +87,7 @@ public class ToDoListService {
         ToDo toDo = find.get();
         switch (status) {
             case open:
+                openAllReferredToDoList(id);
                 toDo.open();
                 break;
             case closed:
@@ -122,6 +130,16 @@ public class ToDoListService {
                 .anyMatch(newRefs -> newRefs.getReferences().stream().anyMatch(ref -> id.equals(ref.getReferredId())))) {
             throw new InvalidReferenceException("cross reference is not available");
         }
+    }
+
+    private void openAllReferredToDoList(Long id) {
+        this.referenceRepository.findAllByReferredId(id).stream()
+                .map(ToDoReference::getToDo)
+                .filter(referredToDo -> referredToDo.getStatus() == Status.closed)
+                .forEach(referredToDo -> {
+                    referredToDo.open();
+                    this.toDoRepository.save(referredToDo);
+                });
     }
 
     private void checkClosable(ToDo toDo) {
