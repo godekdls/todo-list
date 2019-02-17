@@ -5,6 +5,11 @@
 - [JDK 1.8+](https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
 - [maven](https://maven.apache.org)
 
+## 빌드 방법
+```
+mvn clean package -Dmaven.test.skip=true
+```
+
 ## 실행 방법
 ```
 mvn spring-boot:run
