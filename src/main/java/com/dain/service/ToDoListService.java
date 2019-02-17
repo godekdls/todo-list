@@ -5,6 +5,7 @@ import com.dain.exception.NotClosableException;
 import com.dain.exception.NotFoundException;
 import com.dain.model.Status;
 import com.dain.model.ToDo;
+import com.dain.model.ToDoReference;
 import com.dain.repository.ToDoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -50,6 +51,7 @@ public class ToDoListService {
 
         List<Long> newReferences = todo.getReferences().stream()
                 .filter(ref -> !find.get().getReferences().contains(ref))
+                .map(ToDoReference::getReferredId)
                 .collect(toList());
         checkReferable(todo.getId(), newReferences);
         if (todo.getStatus() == Status.closed) {
@@ -114,7 +116,7 @@ public class ToDoListService {
 
     private void checkClosable(ToDo toDo) {
         if (toDo.getReferences().stream()
-                .map(ref -> this.toDoRepository.findById(ref))
+                .map(ref -> this.toDoRepository.findById(ref.getReferredId()))
                 .filter(Optional::isPresent).map(Optional::get)
                 .anyMatch(ref -> ref.getStatus() == Status.open)) {
             throw new NotClosableException();

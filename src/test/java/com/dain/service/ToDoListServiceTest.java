@@ -5,6 +5,7 @@ import com.dain.exception.InvalidReferenceException;
 import com.dain.exception.NotClosableException;
 import com.dain.exception.NotFoundException;
 import com.dain.model.ToDo;
+import com.dain.model.ToDoReference;
 import com.dain.repository.ToDoRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -123,7 +124,9 @@ public class ToDoListServiceTest {
         when(toDoRepository.findById(999l)).thenReturn(Optional.empty());
 
         ToDo request = MockToDoFactory.getMockToDo();
-        request.getReferences().add(999l);
+        ToDoReference reference = new ToDoReference();
+        reference.setReferredId(999l);
+        request.getReferences().add(reference);
 
         // when
         this.toDoListService.update(request);
@@ -138,12 +141,16 @@ public class ToDoListServiceTest {
 
         ToDo mockToDo2 = MockToDoFactory.getMockToDo();
         mockToDo2.setId(20l);
-        mockToDo2.getReferences().add(10l);
+        ToDoReference reference = new ToDoReference();
+        reference.setReferredId(10l);
+        mockToDo2.getReferences().add(reference);
         when(toDoRepository.findById(20l)).thenReturn(Optional.of(mockToDo2));
 
         ToDo request = MockToDoFactory.getMockToDo();
         request.setId(10l);
-        request.getReferences().add(20l);
+        reference = new ToDoReference();
+        reference.setReferredId(20l);
+        request.getReferences().add(reference);
 
         // when
         this.toDoListService.update(request);
@@ -158,7 +165,9 @@ public class ToDoListServiceTest {
 
         ToDo request = MockToDoFactory.getMockToDo();
         request.setId(10l);
-        request.getReferences().add(10l);
+        ToDoReference reference = new ToDoReference();
+        reference.setReferredId(10l);
+        request.getReferences().add(reference);
 
         // then
         this.toDoListService.update(request);
@@ -182,7 +191,9 @@ public class ToDoListServiceTest {
     public void 참조된할일중_열린할일이있으면_할일을_종료할수없다() {
         ToDo mockToDo1 = MockToDoFactory.getMockToDo();
         mockToDo1.setId(10l);
-        mockToDo1.getReferences().add(20l);
+        ToDoReference reference = new ToDoReference();
+        reference.setReferredId(20l);
+        mockToDo1.getReferences().add(reference);
         mockToDo1.complete();
         when(toDoRepository.findById(10l)).thenReturn(Optional.of(mockToDo1));
 
