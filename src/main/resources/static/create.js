@@ -25,9 +25,13 @@ function createToDo() {
             $('#delete-modal').modal('hide');
             location.href = '/todos';
         },
-        error: function () {
+        error: function(xhr, status, error) {
+            if (xhr.status >= 500) {
+                alert('처리에 실패 했습니다.');
+            } else {
+                alert(xhr.responseJSON.message);
+            }
             console.log(arguments);
-            alert('처리에 실패 했습니다.');
         }
     });
 }

@@ -1,5 +1,6 @@
 package com.dain.service;
 
+import com.dain.controller.model.ErrorCause;
 import com.dain.exception.InvalidReferenceException;
 import com.dain.exception.NotClosableException;
 import com.dain.exception.NotFoundException;
@@ -38,6 +39,7 @@ public class ToDoListService {
 
     public Long create(ToDo todo) {
         todo.getReferences().forEach(ref -> ref.setToDo(todo));
+//      ref not found todo
         ToDo toDo = this.toDoRepository.save(todo);
         return toDo.getId();
     }
@@ -116,7 +118,7 @@ public class ToDoListService {
 
     private void checkReferable(Long id, List<Long> newReferences) {
         if (newReferences.contains(id)) {
-            throw new InvalidReferenceException("self reference is not available");
+            throw new InvalidReferenceException(ErrorCause.SELF_REFERENCE);
         }
 
         List<Optional<ToDo>> newReferredToDoList = newReferences.stream()
@@ -124,11 +126,11 @@ public class ToDoListService {
                 .collect(toList());
 
         if (newReferredToDoList.stream().anyMatch(toDo -> !toDo.isPresent())) {
-            throw new InvalidReferenceException("referred todo is not found");
+            throw new InvalidReferenceException(ErrorCause.REFERENCE_NOT_FOUND);
         }
         if (newReferredToDoList.stream().map(Optional::get)
                 .anyMatch(newRefs -> newRefs.getReferences().stream().anyMatch(ref -> id.equals(ref.getReferredId())))) {
-            throw new InvalidReferenceException("cross reference is not available");
+            throw new InvalidReferenceException(ErrorCause.CROSS_REFERENCE);
         }
     }
 

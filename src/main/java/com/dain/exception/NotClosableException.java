@@ -1,9 +1,11 @@
 package com.dain.exception;
 
-public class NotClosableException extends RuntimeException {
+import com.dain.controller.model.ErrorCause;
+
+public class NotClosableException extends AbstractRunTimeException {
 
     public NotClosableException() {
-        super("can not close because referred todo is still open");
+        super(ErrorCause.NOT_CLOSEABLE);
     }
 
 }

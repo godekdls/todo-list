@@ -3,6 +3,7 @@ package com.dain.controller;
 import com.dain.MockToDoFactory;
 import com.dain.ResourceFileReader;
 import com.dain.controller.advice.GlobalExceptionHandler;
+import com.dain.controller.model.ErrorCause;
 import com.dain.exception.InvalidReferenceException;
 import com.dain.exception.NotClosableException;
 import com.dain.exception.NotFoundException;
@@ -250,7 +251,7 @@ public class ToDoListControllerTest {
 
     @Test
     public void update_잘못된_참조가걸린경우_403() throws Exception {
-        when(toDoListService.update(any(ToDo.class))).thenThrow(new InvalidReferenceException("something wrong"));
+        when(toDoListService.update(any(ToDo.class))).thenThrow(new InvalidReferenceException(ErrorCause.REFERENCE_NOT_FOUND));
 
         String json = ResourceFileReader.readFile("todo.json");
         URI uri = UriComponentsBuilder.fromPath("/todos/1")

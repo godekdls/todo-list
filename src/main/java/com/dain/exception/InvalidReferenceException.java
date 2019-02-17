@@ -1,9 +1,11 @@
 package com.dain.exception;
 
-public class InvalidReferenceException extends RuntimeException {
+import com.dain.controller.model.ErrorCause;
 
-    public InvalidReferenceException(String message) {
-        super(message);
+public class InvalidReferenceException extends AbstractRunTimeException {
+
+    public InvalidReferenceException(ErrorCause cause) {
+        super(cause);
     }
 
 }

@@ -1,6 +1,8 @@
 package com.dain.controller.advice;
 
+import com.dain.controller.model.ErrorCause;
 import com.dain.controller.model.ErrorResponse;
+import com.dain.exception.AbstractRunTimeException;
 import com.dain.exception.InvalidReferenceException;
 import com.dain.exception.NotClosableException;
 import com.dain.exception.NotFoundException;
@@ -19,25 +21,32 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({MethodArgumentTypeMismatchException.class, HttpMessageNotReadableException.class, ConstraintViolationException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse _400(Exception ex) {
-        return new ErrorResponse(ex.getMessage());
+        return errorResponse(ex);
     }
 
     @ExceptionHandler({InvalidReferenceException.class, NotClosableException.class})
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public ErrorResponse _403(Exception ex) {
-        return new ErrorResponse(ex.getMessage());
+        return errorResponse(ex);
     }
 
     @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse _404(NotFoundException ex) {
-        return new ErrorResponse(ex.getMessage());
+        return errorResponse(ex);
     }
 
     @ExceptionHandler(RuntimeException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse _500(RuntimeException ex) {
-        return new ErrorResponse(ex.getMessage());
+        return errorResponse(ex);
     }
 
+    private ErrorResponse errorResponse(Exception e) {
+        if (e instanceof AbstractRunTimeException) {
+            return new ErrorResponse(((AbstractRunTimeException) e).getErrorCause());
+        } else {
+            return new ErrorResponse(ErrorCause.UNKNOWN);
+        }
+    }
 }
