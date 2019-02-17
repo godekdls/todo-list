@@ -4,6 +4,7 @@ import com.dain.MockToDoFactory;
 import com.dain.exception.InvalidReferenceException;
 import com.dain.exception.NotClosableException;
 import com.dain.exception.NotFoundException;
+import com.dain.model.Status;
 import com.dain.model.ToDo;
 import com.dain.model.ToDoReference;
 import com.dain.repository.ToDoReferenceRepository;
@@ -19,6 +20,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -176,6 +178,54 @@ public class ToDoListServiceTest {
     }
 
     @Test
+    public void 할일을_수정할때_상태를_열면_참조한_모든_할일을_함께연다() {
+        // given
+        ToDo mockToDo = MockToDoFactory.getMockToDo();
+        mockToDo.setId(100l);
+        mockToDo.complete();
+        ToDo referredToDo = MockToDoFactory.getMockToDo();
+        referredToDo.setId(200l);
+        referredToDo.complete();
+
+        ToDoReference reference = new ToDoReference();
+        reference.setReferredId(referredToDo.getId());
+        reference.setToDo(referredToDo);
+        mockToDo.getReferences().add(reference);
+
+        when(toDoRepository.findById(mockToDo.getId())).thenReturn(Optional.of(mockToDo));
+        when(referenceRepository.findAllByReferredId(mockToDo.getId())).thenReturn(Arrays.asList(reference));
+
+        ToDo request = MockToDoFactory.getMockToDo();
+        request.setId(mockToDo.getId());
+        request.open();
+
+        // when
+        this.toDoListService.update(request);
+
+        // then
+        assertThat(referredToDo.getStatus(), is(Status.open));
+        verify(toDoRepository, times(1)).save(referredToDo);
+    }
+
+    @Test(expected = NotClosableException.class)
+    public void 할일을_수정할때_참조된할일중_열린할일이있으면_할일을_종료할수없다() {
+        ToDo mockToDo1 = MockToDoFactory.getMockToDo();
+        mockToDo1.setId(10l);
+        ToDoReference reference = new ToDoReference();
+        reference.setReferredId(20l);
+        mockToDo1.getReferences().add(reference);
+        mockToDo1.complete();
+        when(toDoRepository.findById(mockToDo1.getId())).thenReturn(Optional.of(mockToDo1));
+
+        ToDo mockToDo2 = MockToDoFactory.getMockToDo();
+        mockToDo2.open();
+        when(toDoRepository.findById(20l)).thenReturn(Optional.of(mockToDo2));
+
+        // when
+        this.toDoListService.update(mockToDo1);
+    }
+
+    @Test
     public void 할일의_상태를_변경할수있다() {
         // given
         ToDo mockToDo = MockToDoFactory.getMockToDo();
@@ -187,6 +237,32 @@ public class ToDoListServiceTest {
 
         // then
         assertThat(num, is(1));
+    }
+
+    @Test
+    public void 상태를_열면_참조한_모든_할일을_함께연다() {
+        // given
+        ToDo mockToDo = MockToDoFactory.getMockToDo();
+        mockToDo.setId(100l);
+        mockToDo.complete();
+        ToDo referredToDo = MockToDoFactory.getMockToDo();
+        referredToDo.setId(200l);
+        referredToDo.complete();
+
+        ToDoReference reference = new ToDoReference();
+        reference.setReferredId(referredToDo.getId());
+        reference.setToDo(referredToDo);
+        mockToDo.getReferences().add(reference);
+
+        when(toDoRepository.findById(mockToDo.getId())).thenReturn(Optional.of(mockToDo));
+        when(referenceRepository.findAllByReferredId(mockToDo.getId())).thenReturn(Arrays.asList(reference));
+
+        // when
+        this.toDoListService.updateStatus(mockToDo.getId(), Status.open);
+
+        // then
+        assertThat(referredToDo.getStatus(), is(Status.open));
+        verify(toDoRepository, times(1)).save(referredToDo);
     }
 
     @Test(expected = NotClosableException.class)
