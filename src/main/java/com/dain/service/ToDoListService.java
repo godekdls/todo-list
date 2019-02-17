@@ -58,8 +58,8 @@ public class ToDoListService {
         }
 
         List<Long> newReferences = todo.getReferences().stream()
-                .filter(ref -> !find.get().getReferences().stream().anyMatch(originalRef -> originalRef.equals(ref)))
                 .map(ToDoReference::getReferredId)
+                .filter(ref -> !find.get().getReferences().stream().anyMatch(originalRef -> ref.equals(originalRef.getReferredId())))
                 .collect(toList());
         checkReferable(todo.getId(), newReferences);
         if (todo.getStatus() == Status.closed) {
@@ -119,7 +119,7 @@ public class ToDoListService {
             throw new InvalidReferenceException("referred todo is not found");
         }
         if (newReferredToDoList.stream().map(Optional::get)
-                .anyMatch(list -> list.getReferences().contains(id))) {
+                .anyMatch(newRefs -> newRefs.getReferences().stream().anyMatch(ref -> id.equals(ref.getReferredId())))) {
             throw new InvalidReferenceException("cross reference is not available");
         }
     }

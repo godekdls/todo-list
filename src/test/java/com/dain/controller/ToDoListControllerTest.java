@@ -25,8 +25,10 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.validation.ConstraintViolationException;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
@@ -83,6 +85,21 @@ public class ToDoListControllerTest {
     }
 
     @Test
+    public void create_제약조건을_어긴경우_400() throws Exception {
+        when(toDoListService.create(any(ToDo.class))).thenThrow(new ConstraintViolationException(new HashSet<>()));
+        String json = ResourceFileReader.readFile("todo.json");
+
+        URI uri = UriComponentsBuilder.fromPath("/todos")
+                .build().toUri();
+
+        mockMvc.perform(MockMvcRequestBuilders.post(uri)
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content(json))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     public void create_생성에_실패한경우_500() throws Exception {
         when(toDoListService.create(any(ToDo.class))).thenThrow(new RuntimeException("something unexpected happened"));
 
@@ -123,19 +140,6 @@ public class ToDoListControllerTest {
     }
 
     @Test
-    public void read_조회에_실패한경우_500() throws Exception {
-        when(toDoListService.read(anyLong())).thenThrow(new RuntimeException("something unexpected happened"));
-
-        URI uri = UriComponentsBuilder.fromPath("/todos/1")
-                .build().toUri();
-
-        mockMvc.perform(MockMvcRequestBuilders.get(uri))
-                .andDo(print())
-                .andExpect(status().isInternalServerError())
-                .andExpect(jsonPath("$.message", is(notNullValue())));
-    }
-
-    @Test
     public void read_존재하지않는_할일일경우_404() throws Exception {
         when(toDoListService.read(anyLong())).thenThrow(new NotFoundException(1l));
 
@@ -145,6 +149,19 @@ public class ToDoListControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.get(uri))
                 .andDo(print())
                 .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message", is(notNullValue())));
+    }
+
+    @Test
+    public void read_조회에_실패한경우_500() throws Exception {
+        when(toDoListService.read(anyLong())).thenThrow(new RuntimeException("something unexpected happened"));
+
+        URI uri = UriComponentsBuilder.fromPath("/todos/1")
+                .build().toUri();
+
+        mockMvc.perform(MockMvcRequestBuilders.get(uri))
+                .andDo(print())
+                .andExpect(status().isInternalServerError())
                 .andExpect(jsonPath("$.message", is(notNullValue())));
     }
 
@@ -167,6 +184,31 @@ public class ToDoListControllerTest {
     public void update_id가_잘못된경우_400() throws Exception {
         String json = ResourceFileReader.readFile("todo.json");
         URI uri = UriComponentsBuilder.fromPath("/todos/a")
+                .build().toUri();
+
+        mockMvc.perform(MockMvcRequestBuilders.put(uri)
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content(json))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void update_바디가_누락된경우_400() throws Exception {
+        URI uri = UriComponentsBuilder.fromPath("/todos/1")
+                .build().toUri();
+
+        mockMvc.perform(MockMvcRequestBuilders.put(uri))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void update_제약조건을_어긴경우_400() throws Exception {
+        when(toDoListService.update(any(ToDo.class))).thenThrow(new ConstraintViolationException(new HashSet<>()));
+        String json = ResourceFileReader.readFile("todo.json");
+
+        URI uri = UriComponentsBuilder.fromPath("/todos/1")
                 .build().toUri();
 
         mockMvc.perform(MockMvcRequestBuilders.put(uri)
@@ -204,16 +246,6 @@ public class ToDoListControllerTest {
                 .andDo(print())
                 .andExpect(status().isInternalServerError())
                 .andExpect(jsonPath("$.message", is(notNullValue())));
-    }
-
-    @Test
-    public void update_바디가_누락된경우_400() throws Exception {
-        URI uri = UriComponentsBuilder.fromPath("/todos/1")
-                .build().toUri();
-
-        mockMvc.perform(MockMvcRequestBuilders.put(uri))
-                .andDo(print())
-                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -266,6 +298,21 @@ public class ToDoListControllerTest {
                 .build().toUri();
 
         mockMvc.perform(MockMvcRequestBuilders.patch(uri))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void patch_제약조건을_어긴경우_400() throws Exception {
+        when(toDoListService.updateStatus(anyLong(), any(Status.class))).thenThrow(new ConstraintViolationException(new HashSet<>()));
+        String json = ResourceFileReader.readFile("todo.json");
+
+        URI uri = UriComponentsBuilder.fromPath("/todos/1")
+                .build().toUri();
+
+        mockMvc.perform(MockMvcRequestBuilders.patch(uri)
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content(json))
                 .andDo(print())
                 .andExpect(status().isBadRequest());
     }

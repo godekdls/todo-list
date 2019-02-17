@@ -32,12 +32,4 @@ public class ToDoReference {
         return referredId.toString();
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof ToDoReference) {
-            return this.referredId.equals(((ToDoReference) obj).referredId);
-        }
-        return false;
-    }
-
 }

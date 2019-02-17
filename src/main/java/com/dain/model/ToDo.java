@@ -2,6 +2,7 @@ package com.dain.model;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -21,6 +22,7 @@ public class ToDo {
 
     @Setter
     @Column(columnDefinition = "varchar(100)", nullable = false)
+    @Length(min = 1, max = 20, message = "할일 빈값일 수 없으며 {max}자 이내로 입력해야 합니다.")
     private String description;
 
     @Column(updatable = false, nullable = false)

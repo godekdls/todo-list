@@ -5,16 +5,15 @@ import com.dain.TestConfig;
 import com.dain.model.Status;
 import com.dain.model.ToDo;
 import com.dain.model.ToDoReference;
-import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
+import javax.validation.ConstraintViolationException;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.Matchers.*;
@@ -39,6 +38,28 @@ public class ToDoRepositoryTest extends TestConfig {
 
         // then
         assertThat(result.getId(), is(notNullValue()));
+    }
+
+    @Test(expected = ConstraintViolationException.class)
+    public void 할일설명은_최소_1자를_입력해야한다() {
+        // given
+        ToDo toDo = MockToDoFactory.getMockToDo();
+        toDo.setId(null);
+        toDo.setDescription("");
+
+        // when
+        this.toDoRepository.save(toDo);
+    }
+
+    @Test(expected = ConstraintViolationException.class)
+    public void 할일설명은_최대_20자를_입력해야한다() {
+        // given
+        ToDo toDo = MockToDoFactory.getMockToDo();
+        toDo.setId(null);
+        toDo.setDescription("12345678901234567890"/*20자*/ + "A");
+
+        // when
+        this.toDoRepository.save(toDo);
     }
 
     @Test
