@@ -234,22 +234,6 @@ public class ToDoListControllerTest {
     }
 
     @Test
-    public void update_수정에_실패한경우_500() throws Exception {
-        when(toDoListService.update(any(ToDo.class))).thenThrow(new RuntimeException("something unexpected happened"));
-
-        String json = ResourceFileReader.readFile("todo.json");
-        URI uri = UriComponentsBuilder.fromPath("/todos/1")
-                .build().toUri();
-
-        mockMvc.perform(MockMvcRequestBuilders.put(uri)
-                .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .content(json))
-                .andDo(print())
-                .andExpect(status().isInternalServerError())
-                .andExpect(jsonPath("$.message", is(notNullValue())));
-    }
-
-    @Test
     public void update_잘못된_참조가걸린경우_403() throws Exception {
         when(toDoListService.update(any(ToDo.class))).thenThrow(new InvalidReferenceException(ErrorCause.REFERENCE_NOT_FOUND));
 
@@ -262,6 +246,38 @@ public class ToDoListControllerTest {
                 .content(json))
                 .andDo(print())
                 .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.message", is(notNullValue())));
+    }
+
+    @Test
+    public void update_존재하지않는경우_404() throws Exception {
+        when(toDoListService.update(any(ToDo.class))).thenThrow(new NotFoundException(1l));
+
+        String json = ResourceFileReader.readFile("todo.json");
+        URI uri = UriComponentsBuilder.fromPath("/todos/1")
+                .build().toUri();
+
+        mockMvc.perform(MockMvcRequestBuilders.put(uri)
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content(json))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message", is(notNullValue())));
+    }
+
+    @Test
+    public void update_수정에_실패한경우_500() throws Exception {
+        when(toDoListService.update(any(ToDo.class))).thenThrow(new RuntimeException("something unexpected happened"));
+
+        String json = ResourceFileReader.readFile("todo.json");
+        URI uri = UriComponentsBuilder.fromPath("/todos/1")
+                .build().toUri();
+
+        mockMvc.perform(MockMvcRequestBuilders.put(uri)
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content(json))
+                .andDo(print())
+                .andExpect(status().isInternalServerError())
                 .andExpect(jsonPath("$.message", is(notNullValue())));
     }
 
@@ -330,6 +346,20 @@ public class ToDoListControllerTest {
                 .content(json))
                 .andDo(print())
                 .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void patch_존재하지않는경우_405() throws Exception {
+        when(toDoListService.updateStatus(anyLong(), any(Status.class))).thenThrow(new NotFoundException(1l));
+        String json = ResourceFileReader.readFile("todo.json");
+        URI uri = UriComponentsBuilder.fromPath("/todos/1")
+                .build().toUri();
+
+        mockMvc.perform(MockMvcRequestBuilders.patch(uri)
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content(json))
+                .andDo(print())
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -419,6 +449,17 @@ public class ToDoListControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(0)));
+    }
+
+    @Test
+    public void list_파라미터가_잘못된경우_400() throws Exception {
+        URI uri = UriComponentsBuilder.fromPath("/todos")
+                .queryParam("currentPage", "a")
+                .build().toUri();
+
+        mockMvc.perform(MockMvcRequestBuilders.get(uri))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
     }
 
     @Test
